@@ -126,6 +126,64 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pengaduan/{ticket_code}', \App\Livewire\Mahasiswa\DetailPengaduan::class)->name('pengaduan.detail');
     });
 });
+
+// ============================================================
+// AUTO DEPLOY WEBHOOK (VERSI LINUX SERVER)
+// ============================================================
+Route::get('/update-rahasia-dpm', function () {
+    $repoDir = base_path(); // Alamat folder Laravel (/app)
+    
+
+      // AUTO-PATCH .env for production domain
+      $envFile = base_path('.env');
+      if (file_exists($envFile)) {
+          $env = file_get_contents($envFile);
+          $env = preg_replace('/^APP_URL=.*/m', 'APP_URL=https://easpira-dpm.xie.my.id', $env);
+          $env = preg_replace('/^APP_ENV=.*/m', 'APP_ENV=production', $env);
+          $env = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=false', $env);
+          $env = preg_replace('/^GOOGLE_REDIRECT_URI=.*/m', 'GOOGLE_REDIRECT_URI=https://easpira-dpm.xie.my.id/auth/google/callback', $env);
+          file_put_contents($envFile, $env);
+      }
+    // 1. Mantra Sakti mengatasi "Dubious Ownership" (PENTING!)
+    shell_exec("git config --global --add safe.directory \"$repoDir\"");
+    
+    // 2. Eksekusi Perintah Pembaruan
+    $output1 = shell_exec("cd \"$repoDir\" && git fetch --all 2>&1");
+    $output2 = shell_exec("cd \"$repoDir\" && git reset --hard origin/main 2>&1");
+    
+    // Pakai --no-interaction agar composer tidak nyangkut minta konfirmasi
+    $output3 = shell_exec("cd \"$repoDir\" && composer install --no-interaction --prefer-dist --optimize-autoloader 2>&1");
+    $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
+    $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
+    $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link 2>&1");
+    
+    // Catatan: Jika NPM/Node.js belum terinstall di Docker ini, outputnya mungkin "command not found"
+    $output5 = shell_exec("cd \"$repoDir\" && npm install 2>&1");
+    $output6 = shell_exec("cd \"$repoDir\" && npm run build 2>&1");
+    
+    return "<h1 style='color:green;'>Berhasil Menarik Kodingan Baru & Update Sistem oleh MSS!</h1>
+            <h3>Laporan Log:</h3>
+            <pre style='background:#333;color:#0f0;padding:20px;border-radius:10px;'>
+[GIT FETCH & PULL]
+" . htmlspecialchars((string) $output1) . "
+" . htmlspecialchars((string) $output2) . "
+
+[COMPOSER INSTALL]
+" . htmlspecialchars((string) $output3) . "
+
+[DATABASE MIGRATE]
+" . htmlspecialchars((string) $output4) . "
+
+[CLEAR CACHE & STORAGE LINK]
+" . htmlspecialchars((string) $output_clear) . "
+" . htmlspecialchars((string) $output_link) . "
+
+[NPM BUILD (TAMPILAN)]
+" . htmlspecialchars((string) $output5) . "
+" . htmlspecialchars((string) $output6) . "
+            </pre>";
+});
+
 // ============================================================
 // AUTO DEPLOY WEBHOOK 
 // ============================================================
@@ -180,6 +238,7 @@ Route::get('/update-rahasia-mss', function () {
 });
 
 require __DIR__.'/auth.php';
+
 
 
 
