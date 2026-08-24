@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 
@@ -12,10 +13,17 @@ class GoogleController extends Controller
 {
     /**
      * Redirect the user to the Google authentication page.
+     * Menggunakan URL dinamis agar selalu cocok dengan domain saat ini.
      */
     public function redirect()
     {
-        return Socialite::driver('google')->with(['prompt' => 'select_account'])->redirect();
+        // Paksa redirect URI menggunakan APP_URL yang aktif saat ini
+        $redirectUri = url('/auth/google/callback');
+
+        return Socialite::driver('google')
+            ->redirectUrl($redirectUri)
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
     }
 
     /**
@@ -24,9 +32,14 @@ class GoogleController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            // Paksa redirect URI sama dengan saat redirect agar tidak mismatch
+            $redirectUri = url('/auth/google/callback');
 
-            // KUNCI: Wajib email kampus
+            $googleUser = Socialite::driver('google')
+                ->redirectUrl($redirectUri)
+                ->user();
+
+            // KUNCI: Wajib email kampus @students.polmed.ac.id
             if (!Str::endsWith($googleUser->getEmail(), '@students.polmed.ac.id')) {
                 return redirect()->route('login', ['oauth_error' => 'not_polmed']);
             }
@@ -35,27 +48,26 @@ class GoogleController extends Controller
             $user = User::where('google_id', $googleUser->getId())->first();
 
             if (!$user) {
-                // Jika belum, cek apakah emailnya sudah terdaftar (mungkin daftar manual sebelumnya)
+                // Jika belum, cek apakah emailnya sudah terdaftar
                 $user = User::where('email', $googleUser->getEmail())->first();
 
                 if ($user) {
                     // Update user yang sudah ada dengan google_id
                     $user->update([
                         'google_id' => $googleUser->getId(),
-                        'avatar' => $googleUser->getAvatar(),
+                        'avatar'    => $googleUser->getAvatar(),
                     ]);
                 } else {
                     // Buat user baru secara otomatis
                     $user = User::create([
-                        'name' => $googleUser->getName(),
-                        'nama' => $googleUser->getName(),
-                        'email' => $googleUser->getEmail(),
+                        'name'      => $googleUser->getName(),
+                        'nama'      => $googleUser->getName(),
+                        'email'     => $googleUser->getEmail(),
                         'google_id' => $googleUser->getId(),
-                        'avatar' => $googleUser->getAvatar(),
-                        'password' => null, // Password kosong karena login via SSO
-                        // NIM & Prodi diset null, bisa dilengkapi nanti di profil
-                        'nim' => null,
-                        'prodi' => null,
+                        'avatar'    => $googleUser->getAvatar(),
+                        'password'  => null,
+                        'nim'       => null,
+                        'prodi'     => null,
                         'is_active' => true,
                     ]);
 
@@ -64,7 +76,7 @@ class GoogleController extends Controller
                 }
             }
 
-            // Login user tersebut
+            // Login user
             Auth::login($user, true);
 
             // Redirect ke dashboard sesuai role
@@ -75,14 +87,11 @@ class GoogleController extends Controller
             } elseif ($user->isHMPS() || $user->isUKM()) {
                 return redirect()->route('organisasi.dashboard');
             }
-            
+
             return redirect()->route('mahasiswa.dashboard');
 
         } catch (\Exception $e) {
-            // Jika terjadi error saat auth dengan google
-            return redirect()->route('login')->with('error', 'Terjadi kesalahan saat login dengan Google: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', 'Gagal login dengan Google: ' . $e->getMessage());
         }
     }
 }
-
-
