@@ -165,8 +165,8 @@
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-4">
-                            <input type="checkbox" wire:model.live="is_anonim" class="sr-only peer" {{ $is_anonim ? 'checked' : ' }}>
-                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-['] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                            <input type="checkbox" wire:model.live="is_anonim" class="sr-only peer">
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                         </label>
                     </div>
                 @endif
@@ -340,6 +340,7 @@
         </form>
     </div>
 </div>
+
 
 
 
