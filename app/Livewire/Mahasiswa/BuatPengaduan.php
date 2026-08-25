@@ -40,11 +40,11 @@ class BuatPengaduan extends Component
             'kategori_lainnya' => 'nullable|string|max:100',
             'isi'              => 'required|string|min:20',
             'fotos'            => 'nullable|array|max:3',
-            'fotos.*'          => 'max:10240', // Max 10MB per file (mendukung berbagai format foto termasuk HEIC/iPhone)
+            'fotos.*'          => 'max:15360', // Max 15MB per file
         ], [
             'isi.min'          => 'Isi pengaduan minimal 20 karakter untuk kejelasan.',
             'fotos.max'        => 'Maksimal hanya boleh mengunggah 3 foto.',
-            'fotos.*.max'      => 'Ukuran setiap foto maksimal 10MB.',
+            'fotos.*.max'      => 'Ukuran setiap foto maksimal 15MB.',
         ]);
 
         $kategori = KategoriPengaduan::find($this->kategori_id);
@@ -66,38 +66,33 @@ class BuatPengaduan extends Component
         $lampiranPaths = [];
         if (!empty($this->fotos)) {
             $manager = new ImageManager(new Driver());
+            $publicDir = storage_path('app/public/lampiran/' . $ticketCode);
+            if (!file_exists($publicDir)) {
+                mkdir($publicDir, 0755, true);
+            }
             
             foreach ($this->fotos as $foto) {
                 $ext = strtolower($foto->getClientOriginalExtension() ?: 'jpg');
-                $filename = uniqid('lampiran_') . '.' . $ext;
-                $storageDir = 'public/lampiran/' . $ticketCode;
-                $fullDir = storage_path('app/' . $storageDir);
-                
-                // Pastikan direktori ada
-                if (!file_exists($fullDir)) {
-                    mkdir($fullDir, 0755, true);
-                }
-
                 $saved = false;
-                // Coba kompresi jika format gambar standar
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
-                    try {
-                        $jpgName = uniqid('lampiran_') . '.jpg';
-                        $fullPath = $fullDir . '/' . $jpgName;
-                        $image = $manager->read($foto->getRealPath());
-                        $image->scaleDown(width: 1280); // Kecilkan resolusi
-                        $image->toJpeg(80)->save($fullPath);
-                        $lampiranPaths[] = 'lampiran/' . $ticketCode . '/' . $jpgName;
-                        $saved = true;
-                    } catch (\Throwable $e) {
-                        $saved = false;
-                    }
+
+                // Coba kompresi menjadi JPG
+                try {
+                    $jpgName = uniqid('lampiran_') . '.jpg';
+                    $fullPath = $publicDir . '/' . $jpgName;
+                    $image = $manager->read($foto->getRealPath());
+                    $image->scaleDown(width: 1600); // Skala resolusi
+                    $image->toJpeg(85)->save($fullPath);
+                    $lampiranPaths[] = 'lampiran/' . $ticketCode . '/' . $jpgName;
+                    $saved = true;
+                } catch (\Throwable $e) {
+                    $saved = false;
                 }
 
-                // Fallback simpan file aslinya (misal HEIC, PDF, dll)
+                // Fallback simpan file aslinya ke disk 'public'
                 if (!$saved) {
-                    $stored = $foto->storeAs($storageDir, $filename);
-                    $lampiranPaths[] = str_replace('public/', '', $stored);
+                    $filename = uniqid('lampiran_') . '.' . $ext;
+                    $stored = $foto->storeAs('lampiran/' . $ticketCode, $filename, 'public');
+                    $lampiranPaths[] = $stored;
                 }
             }
         }

@@ -1,7 +1,7 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-orange-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/30">
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-orange-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/30">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
             </div>
             <div>
@@ -58,74 +58,68 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <span class="block text-sm font-bold text-slate-800">{{ $kat->nama_kategori }}</span>
+                                    <span class="block text-xs text-slate-500 mt-0.5">{{ $kat->deskripsi }}</span>
                                     @if($isSensitif)
-                                        <span class="inline-flex items-center gap-1 mt-1 text-xs text-rose-600 font-semibold">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                            Otomatis Anonim
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full mt-1.5">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                            Otomatis Terenkripsi & Anonim
                                         </span>
                                     @endif
                                 </div>
-                                @if($isSelected)
-                                    <svg class="w-5 h-5 {{ $isSensitif ? 'text-rose-500' : 'text-indigo-600' }} shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/>
-                                    </svg>
-                                @endif
                             </div>
                         </label>
                     @endforeach
                 </div>
                 @error('kategori_id') <p class="text-xs text-rose-500 mt-2 font-medium">{{ $message }}</p> @enderror
 
-                {{-- Input "Lainnya" --}}
+                {{-- Input Tambahan jika Kategori Lainnya --}}
                 @php
-                    $selectedKat = $kategori_id ? $kategoriList->firstWhere('id', $kategori_id) : null;
-                    $isLainnya = $selectedKat && strtolower($selectedKat->nama_kategori) === 'lainnya';
+                    $selectedKategori = $kategoriList->firstWhere('id', $kategori_id);
                 @endphp
-                @if($isLainnya)
-                <div class="mt-4 animate-fade-in">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
-                        Sebutkan jenis laporan Anda <span class="text-rose-500">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        wire:model="kategori_lainnya"
-                        class="block w-full rounded-xl border-slate-200 bg-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-3"
-                        placeholder="Contoh: Bullying, Diskriminasi, Korupsi Dana, dll."
-                    >
-                    @error('kategori_lainnya') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
-                </div>
+                @if($selectedKategori && strtolower($selectedKategori->nama_kategori) === 'lainnya')
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                            Sebutkan Jenis Pengaduan / Aspirasi <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            wire:model="kategori_lainnya"
+                            class="w-full rounded-xl border-slate-200 bg-white text-sm px-4 py-2.5 focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="Contoh: Parkir Liar, Kantin Kampus, UKT, Beasiswa..."
+                        >
+                        @error('kategori_lainnya') <p class="text-xs text-rose-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
                 @endif
             </div>
 
-            {{-- LANGKAH 2: Privasi --}}
+            {{-- LANGKAH 2: Pengaturan Privasi --}}
             <div class="glass rounded-3xl p-6 md:p-8 border border-white/60 shadow-xl shadow-slate-200/50">
                 <div class="flex items-center gap-3 mb-5">
                     <div class="w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold flex items-center justify-center shrink-0">2</div>
-                    <h3 class="text-lg font-bold text-slate-800">Pengaturan Identitas</h3>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Pengaturan Privasi</h3>
+                        <p class="text-xs text-slate-500">Pilih apakah identitas Anda ditampilkan atau disembunyikan.</p>
+                    </div>
                 </div>
 
-                @php
-                    $isSensitifMode = false;
-                    if($kategori_id) {
-                        $k = $kategoriList->firstWhere('id', $kategori_id);
-                        if($k && $k->level_sensitivitas === 'tinggi') $isSensitifMode = true;
-                    }
-                @endphp
-
-                @if($isSensitifMode)
-                    <div class="flex items-start gap-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl">
+                @if($selectedKategori && $selectedKategori->level_sensitivitas === 'tinggi')
+                    {{-- Kasus Sensitif: Terkunci Anonim --}}
+                    <div class="flex items-start gap-4 p-4 rounded-2xl bg-rose-50 border border-rose-200">
                         <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-rose-800">Identitas Anda Dilindungi Otomatis</p>
-                            <p class="text-xs text-rose-600 mt-1">Kategori ini bersifat sensitif. Identitas Anda otomatis dienkripsi dengan AES-256 dan hanya dapat dibuka oleh tim khusus DPM jika benar-benar diperlukan.</p>
+                            <p class="text-sm font-bold text-rose-800">Privasi Terkunci: Mode Anonim & Terenkripsi</p>
+                            <p class="text-xs text-rose-600 mt-1 leading-relaxed">
+                                Kategori ini diklasifikasikan sebagai <strong>sangat sensitif</strong>. Identitas Anda otomatis dienkripsi dengan standar AES-256-CBC dan disembunyikan.
+                            </p>
                         </div>
                     </div>
                 @else
-                    <div class="flex items-center justify-between p-5 rounded-2xl border {{ $is_anonim ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200' }} transition-all duration-300">
-                        <div class="flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-xl {{ $is_anonim ? 'bg-slate-700 text-slate-300' : 'bg-indigo-100 text-indigo-600' }} flex items-center justify-center shrink-0 transition-colors">
+                    {{-- Pengaduan Biasa: Pilihan Anonim / Umum --}}
+                    <div class="flex items-center justify-between p-4 rounded-2xl border transition-all duration-200 {{ $is_anonim ? 'bg-slate-900 text-white border-slate-700' : 'bg-slate-50 border-slate-200' }}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl {{ $is_anonim ? 'bg-slate-800 text-indigo-400' : 'bg-white text-slate-600 border border-slate-200' }} flex items-center justify-center shrink-0">
                                 @if($is_anonim)
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
                                 @else
@@ -134,7 +128,7 @@
                             </div>
                             <div>
                                 <p class="text-sm font-bold {{ $is_anonim ? 'text-white' : 'text-slate-800' }}">
-                                    {{ $is_anonim ? '🔒 Laporan Anonim' : '👤 Laporan dengan Nama' }}
+                                    {{ $is_anonim ? 'Laporan Anonim (Identitas Tersembunyi)' : 'Laporan dengan Nama (Identitas Terlihat)' }}
                                 </p>
                                 <p class="text-xs mt-1 {{ $is_anonim ? 'text-slate-400' : 'text-slate-500' }}">
                                     @if($is_anonim)
@@ -170,13 +164,48 @@
                 @error('isi') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
             </div>
 
-            {{-- LANGKAH 4: Lampiran --}}
-            <div class="glass rounded-3xl p-6 md:p-8 border border-white/60 shadow-xl shadow-slate-200/50">
+            {{-- LANGKAH 4: Lampiran Foto / Bukti --}}
+            <div class="glass rounded-3xl p-6 md:p-8 border border-white/60 shadow-xl shadow-slate-200/50" 
+                 x-data="{
+                    isConverting: false,
+                    async handleUpload(event) {
+                        const input = event.target;
+                        const files = Array.from(input.files);
+                        if (!files.length) return;
+
+                        let hasHeic = files.some(f => f.name.toLowerCase().endsWith('.heic') || f.name.toLowerCase().endsWith('.heif'));
+
+                        if (hasHeic && typeof heic2any !== 'undefined') {
+                            this.isConverting = true;
+                            try {
+                                const dt = new DataTransfer();
+                                for (let file of files) {
+                                    const isH = file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif');
+                                    if (isH) {
+                                        const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+                                        const singleBlob = Array.isArray(blob) ? blob[0] : blob;
+                                        const converted = new File([singleBlob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), { type: 'image/jpeg' });
+                                        dt.items.add(converted);
+                                    } else {
+                                        dt.items.add(file);
+                                    }
+                                }
+                                input.files = dt.files;
+                            } catch (e) {
+                                console.warn('HEIC convert error:', e);
+                            } finally {
+                                this.isConverting = false;
+                            }
+                        }
+
+                        @this.uploadMultiple('fotos', input.files);
+                    }
+                 }">
                 <div class="flex items-center gap-3 mb-5">
                     <div class="w-8 h-8 rounded-full bg-slate-400 text-white text-sm font-bold flex items-center justify-center shrink-0">4</div>
                     <div>
                         <h3 class="text-lg font-bold text-slate-800">Lampiran Bukti <span class="text-xs font-normal text-slate-400 ml-1">(Opsional)</span></h3>
-                        <p class="text-xs text-slate-500">Foto, tangkapan layar, atau dokumen. Maks 3 foto, 10MB each.</p>
+                        <p class="text-xs text-slate-500">Mendukung Foto Kamera, iPhone (HEIC), PNG, JPG, atau PDF. Maks 3 berkas.</p>
                     </div>
                 </div>
 
@@ -185,12 +214,16 @@
                         <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center transition-colors">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         </div>
-                        <p class="text-sm text-slate-500 group-hover:text-indigo-600 font-medium transition-colors">
-                            <span wire:loading.remove wire:target="fotos">Klik atau seret foto ke sini</span>
-                            <span wire:loading wire:target="fotos" class="text-indigo-600">Mengunggah...</span>
+                        <p class="text-sm text-slate-500 group-hover:text-indigo-600 font-medium transition-colors text-center px-4">
+                            <span x-show="!isConverting" wire:loading.remove wire:target="fotos">Klik atau seret foto ke sini</span>
+                            <span x-show="isConverting" x-cloak class="text-indigo-600 font-bold flex items-center gap-1.5">
+                                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Mengonversi foto iPhone...
+                            </span>
+                            <span x-show="!isConverting" wire:loading wire:target="fotos" class="text-indigo-600 font-bold">Mengunggah berkas...</span>
                         </p>
                     </div>
-                    <input id="file-upload" wire:model="fotos" type="file" class="sr-only" multiple accept="image/*,.heic,.heif,.pdf">
+                    <input id="file-upload" type="file" class="sr-only" multiple accept="image/*,.heic,.heif,.pdf" @change="handleUpload($event)">
                 </label>
                 @error('fotos') <p class="text-xs text-rose-500 mt-2 font-medium">{{ $message }}</p> @enderror
                 @error('fotos.*') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
@@ -200,13 +233,13 @@
                         @foreach($fotos as $idx => $foto)
                             @php
                                 $isPrev = method_exists($foto, 'isPreviewable') && $foto->isPreviewable();
-                                $name = method_exists($foto, 'getClientOriginalName') ? $foto->getClientOriginalName() : 'File ' . ($idx + 1);
+                                $name = method_exists($foto, 'getClientOriginalName') ? $foto->getClientOriginalName() : 'Foto ' . ($idx + 1);
                                 $ext = strtoupper(pathinfo($name, PATHINFO_EXTENSION) ?: 'FOTO');
                             @endphp
                             <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-sm aspect-square bg-slate-100 flex flex-col items-center justify-center p-2 group">
                                 @if($isPrev)
                                     <img src="{{ $foto->temporaryUrl() }}" class="w-full h-full object-cover rounded-xl">
-                                    <div class="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
+                                    <div class="absolute bottom-1.5 right-1.5 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
                                         {{ $ext }}
                                     </div>
                                 @else
@@ -215,7 +248,7 @@
                                     </div>
                                     <span class="text-[11px] font-bold text-slate-800 truncate max-w-full px-2 text-center">{{ $name }}</span>
                                     <span class="mt-1.5 inline-block text-[9px] font-bold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-md uppercase tracking-wider">
-                                        {{ $ext }} Terpilih
+                                        {{ $ext }}
                                     </span>
                                 @endif
                             </div>
@@ -244,8 +277,3 @@
         </form>
     </div>
 </div>
-
-
-
-
-

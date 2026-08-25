@@ -157,7 +157,7 @@ Route::get('/update-rahasia-dpm', function () {
       $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
     $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
-    $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link 2>&1");
+    $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
     
     // Catatan: Jika NPM/Node.js belum terinstall di Docker ini, outputnya mungkin "command not found"
     $output5 = shell_exec("cd \"$repoDir\" && npm install 2>&1");
@@ -247,6 +247,33 @@ Route::post('logout', function (\App\Livewire\Actions\Logout $logout) {
     return redirect('/');
 })->name('logout');
 
+
+// Route pembantu penyedia file storage (menjamin file lampiran selalu bisa dibuka tanpa 404)
+Route::get('storage/{path}', function ($path) {
+    $candidates = [
+        storage_path('app/public/' . $path),
+        storage_path('app/private/public/' . $path),
+        storage_path('app/private/' . $path),
+        storage_path('app/' . $path),
+        public_path('storage/' . $path),
+    ];
+    
+    foreach ($candidates as $filePath) {
+        if (file_exists($filePath) && !is_dir($filePath)) {
+            $mime = mime_content_type($filePath) ?: 'application/octet-stream';
+            $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+            if ($ext === 'heic' || $ext === 'heif') {
+                $mime = 'image/heic';
+            }
+            return response()->file($filePath, [
+                'Content-Type' => $mime,
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+    }
+    abort(404, 'File lampiran tidak ditemukan di server.');
+})->where('path', '.*');
+
 require __DIR__.'/auth.php';
 
 
@@ -277,4 +304,5 @@ Route::get('/cek-log-error', function () {
     return '<pre style="background:#1a1a1a;color:#ff6b6b;padding:20px;font-size:11px;white-space:pre-wrap;">' 
         . htmlspecialchars(implode('', $lines)) . '</pre>';
 });
+
 

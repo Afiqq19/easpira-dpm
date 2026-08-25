@@ -61,7 +61,34 @@
                             <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             Lampiran Bukti ({{ count($pengaduan->lampiran) }})
                         </h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" x-data="{
+                            init() {
+                                this.$nextTick(() => {
+                                    document.querySelectorAll(''[data-heic-src]'').forEach(async (el) => {
+                                        const url = el.getAttribute(''data-heic-src'');
+                                        try {
+                                            const res = await fetch(url);
+                                            if (!res.ok) return;
+                                            const blob = await res.blob();
+                                            if (typeof heic2any !== ''undefined'') {
+                                                const converted = await heic2any({ blob: blob, toType: ''image/jpeg'', quality: 0.85 });
+                                                const singleBlob = Array.isArray(converted) ? converted[0] : converted;
+                                                const blobUrl = URL.createObjectURL(singleBlob);
+                                                el.src = blobUrl;
+                                                el.classList.remove(''hidden'');
+                                                const parent = el.closest(''.heic-container'');
+                                                if (parent) {
+                                                    const fb = parent.querySelector(''.heic-fallback'');
+                                                    if (fb) fb.classList.add(''hidden'');
+                                                }
+                                            }
+                                        } catch (e) {
+                                            console.warn(''HEIC inline render failed:'', e);
+                                        }
+                                    });
+                                });
+                            }
+                        }">
                             @foreach($pengaduan->lampiran as $path)
                                 @php
                                     $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
@@ -241,4 +268,5 @@
         </div>
     </div>
 </div>
+
 
