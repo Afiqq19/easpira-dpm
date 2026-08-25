@@ -13,24 +13,20 @@ class Sidebar extends Component
     }
     
     /**
-     * Check if a given route is active and return dark-theme CSS classes
+     * Check if a given route is active and return luxury active classes
      */
     public function isActive($route)
     {
-        return request()->routeIs($route) ? 'bg-indigo-500/20 text-indigo-300 font-semibold' : 'text-slate-400 hover:bg-white/10 hover:text-white';
+        return request()->routeIs($route) 
+            ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg shadow-indigo-600/30 border border-indigo-400/30' 
+            : 'text-slate-400 hover:bg-white/[0.07] hover:text-white hover:translate-x-1 transition-all duration-200';
     }
 
-    /**
-     * Alias for isActive - used in new sidebar template
-     */
     public function isActiveClass($route)
     {
-        return request()->routeIs($route) ? 'bg-indigo-500/20 text-indigo-300 font-semibold' : 'text-slate-400 hover:bg-white/10 hover:text-white';
+        return $this->isActive($route);
     }
 
-    /**
-     * Logout
-     */
     public function logout()
     {
         Auth::logout();

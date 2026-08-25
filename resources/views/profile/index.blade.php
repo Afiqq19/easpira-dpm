@@ -149,7 +149,7 @@
                         </div>
                     </div>
                     <p class="text-xs text-slate-600 leading-relaxed">
-                        Identitas pada laporan bertipe <strong>Anonim</strong> dienkripsi menggunakan algoritma <strong>AES-256-CBC</strong>. Staf biasa tidak dapat melihat nama maupun NIM Anda.
+                        Identitas pada laporan bertipe <strong>Anonim</strong> dienkripsi menggunakan algoritma <strong>AES-256-CBC</strong>. Staf tidak dapat melihat nama maupun NIM Anda.
                     </p>
                     <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
                         <span>Status Enkripsi:</span>
