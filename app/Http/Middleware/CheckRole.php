@@ -11,8 +11,6 @@ class CheckRole
 {
     /**
      * Middleware untuk memeriksa role pengguna.
-     * Penggunaan di routes: ->middleware('check.role:admin')
-     *                       ->middleware('check.role:admin,staff_dewan')
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      * @param  string  ...$roles  Satu atau lebih role yang diizinkan
@@ -31,12 +29,16 @@ class CheckRole
 
         $user = $request->user();
 
-        // Pastikan jika user belum memiliki role apapun (misal baru login Google / DB server belum diseed),
-        // otomatis buat role 'mahasiswa' dan berikan ke user.
+        // Pastikan jika user belum memiliki role apapun, berikan 'mahasiswa'
         if ($user->roles->isEmpty()) {
             Role::firstOrCreate(['name' => 'mahasiswa', 'guard_name' => 'web']);
             $user->assignRole('mahasiswa');
             $user->load('roles');
+        }
+
+        // Admin memiliki hak akses penuh ke semua halaman untuk pengujian & manajemen
+        if ($user->hasRole('admin')) {
+            return $next($request);
         }
 
         // Cek apakah user memiliki salah satu dari role yang diizinkan

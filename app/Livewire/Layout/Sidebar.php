@@ -18,8 +18,8 @@ class Sidebar extends Component
     public function isActive($route)
     {
         return request()->routeIs($route) 
-            ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold shadow-lg shadow-indigo-600/30 border border-indigo-400/30' 
-            : 'text-slate-400 hover:bg-white/[0.07] hover:text-white hover:translate-x-1 transition-all duration-200';
+            ? 'bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 text-white font-bold shadow-md shadow-indigo-500/25 border border-indigo-400/20' 
+            : 'text-slate-600 hover:text-indigo-600 hover:bg-indigo-50/80 hover:translate-x-1 font-semibold transition-all duration-200';
     }
 
     public function isActiveClass($route)
