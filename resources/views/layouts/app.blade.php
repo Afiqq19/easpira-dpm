@@ -55,11 +55,11 @@
                         </div>
 
                         <!-- Search bar (Desktop only) -->
-                        <form wire:submit.prevent="searchTicket" class="relative w-full max-w-md hidden md:block">
+                        <form action="{{ route('dashboard.redirect') }}" method="GET" class="relative w-full max-w-md hidden md:block">
                             <button type="submit" class="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer hover:text-indigo-600 transition-colors">
                                 <svg class="h-5 w-5 text-slate-400 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </button>
-                            <input type="text" wire:model="searchQuery" class="block w-full pl-10 pr-3 py-2 border-none rounded-xl bg-slate-100/80 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm" placeholder="Lacak tiket (PLP-...)">
+                            <input type="text" name="search" class="block w-full pl-10 pr-3 py-2 border-none rounded-xl bg-slate-100/80 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm" placeholder="Lacak tiket (PLP-...)">
                         </form>
                     </div>
                     
@@ -83,7 +83,13 @@
                                     Profil Saya
                                 </a>
                                 <div class="border-t border-slate-100"></div>
-                                <livewire:layout.logout-button />
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition-colors text-left">
+                                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                        Keluar
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -148,5 +154,6 @@
         </script>
     </body>
 </html>
+
 
 

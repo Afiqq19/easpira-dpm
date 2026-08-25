@@ -241,6 +241,12 @@ Route::get('/update-rahasia-mss', function () {
             </pre>";
 });
 
+
+Route::post('logout', function (\App\Livewire\Actions\Logout $logout) {
+    $logout();
+    return redirect('/');
+})->name('logout');
+
 require __DIR__.'/auth.php';
 
 
@@ -260,4 +266,15 @@ require __DIR__.'/auth.php';
 
 
 
+
+
+
+// Temporary: Lihat error log server (hapus setelah debug selesai)
+Route::get('/cek-log-error', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (!file_exists($logFile)) return 'Log file tidak ada.';
+    $lines = array_slice(file($logFile), -80);
+    return '<pre style="background:#1a1a1a;color:#ff6b6b;padding:20px;font-size:11px;white-space:pre-wrap;">' 
+        . htmlspecialchars(implode('', $lines)) . '</pre>';
+});
 
