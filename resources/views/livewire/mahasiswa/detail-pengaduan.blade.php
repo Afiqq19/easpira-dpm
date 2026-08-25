@@ -12,96 +12,83 @@
     </x-slot>
 
     <div class="max-w-5xl mx-auto space-y-6">
-        <!-- Status Tracker Bar Modern -->
-        <div class="glass p-6 md:p-8 rounded-3xl shadow-lg border border-white/60">
+        <!-- Status Tracker Bar (Kompak & 100% Horizontal ke Samping) -->
+        <div class="glass p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-md border border-white/60">
             @php
                 $stepList = [
-                    ['key' => 'diterima', 'label' => 'Diterima', 'desc' => 'Laporan masuk'],
-                    ['key' => 'diverifikasi', 'label' => 'Diverifikasi', 'desc' => 'Pemeriksaan awal'],
-                    ['key' => 'diproses', 'label' => 'Diproses', 'desc' => 'Ditangani komisi'],
-                    ['key' => 'ditindaklanjuti', 'label' => 'Tindak Lanjut', 'desc' => 'Aksi lapangan'],
-                    ['key' => 'selesai', 'label' => 'Selesai', 'desc' => 'Kasus tuntas'],
+                    ['label' => 'Diterima'],
+                    ['label' => 'Diverifikasi'],
+                    ['label' => 'Diproses'],
+                    ['label' => 'Tindak Lanjut'],
+                    ['label' => 'Selesai'],
                 ];
                 $statuses = ['diterima', 'diverifikasi', 'diproses', 'ditindaklanjuti', 'selesai'];
                 $currentIndex = array_search($pengaduan->status, $statuses);
                 if ($currentIndex === false) {
                     $currentIndex = ($pengaduan->status === 'ditolak') ? -1 : 0;
                 }
+
+                $badgeStyles = [
+                    'diterima' => 'bg-blue-50 text-blue-700 border-blue-200',
+                    'diverifikasi' => 'bg-amber-50 text-amber-700 border-amber-200',
+                    'diproses' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                    'ditindaklanjuti' => 'bg-purple-50 text-purple-700 border-purple-200',
+                    'selesai' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    'ditolak' => 'bg-rose-50 text-rose-700 border-rose-200',
+                ];
+                $badgeStyle = $badgeStyles[$pengaduan->status] ?? 'bg-slate-50 text-slate-700 border-slate-200';
             @endphp
             
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
-                <div>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
-                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Status Penanganan Aspirasi
-                    </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Alur proses verifikasi dan tindak lanjut laporan Anda oleh DPM</p>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                    <h3 class="text-xs sm:text-sm font-bold text-slate-800 tracking-tight">Status Penanganan</h3>
                 </div>
-                @php
-                    $badgeStyles = [
-                        'diterima' => 'bg-blue-50 text-blue-700 border-blue-200',
-                        'diverifikasi' => 'bg-amber-50 text-amber-700 border-amber-200',
-                        'diproses' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                        'ditindaklanjuti' => 'bg-purple-50 text-purple-700 border-purple-200',
-                        'selesai' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                        'ditolak' => 'bg-rose-50 text-rose-700 border-rose-200',
-                    ];
-                    $badgeStyle = $badgeStyles[$pengaduan->status] ?? 'bg-slate-50 text-slate-700 border-slate-200';
-                @endphp
-                <span class="self-start sm:self-auto px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border {{ $badgeStyle }} shadow-sm">
-                    Status: {{ $pengaduan->status }}
+                <span class="px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border {{ $badgeStyle }} shadow-sm">
+                    {{ $pengaduan->status }}
                 </span>
             </div>
             
             @if($pengaduan->status === 'ditolak')
-                <div class="p-5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    </div>
+                <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-3">
+                    <svg class="w-5 h-5 text-rose-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     <div>
-                        <h4 class="text-sm font-bold text-rose-800 mb-1">Pengaduan Ditolak</h4>
-                        <p class="text-xs text-rose-700 leading-relaxed font-medium">Alasan: {{ $pengaduan->alasan_penolakan ?? 'Pengaduan tidak memenuhi syarat verifikasi atau duplikasi.' }}</p>
+                        <h4 class="text-xs font-bold text-rose-800">Pengaduan Ditolak</h4>
+                        <p class="text-xs text-rose-700 leading-relaxed font-medium mt-0.5">{{ $pengaduan->alasan_penolakan ?? 'Pengaduan tidak memenuhi kriteria verifikasi atau duplikasi.' }}</p>
                     </div>
                 </div>
             @else
-                <div class="relative py-2">
-                    <!-- Progress Bar Background Track (Desktop) -->
-                    <div class="hidden sm:block absolute top-1/2 left-8 right-8 -translate-y-5 h-1.5 bg-slate-200 rounded-full z-0">
-                        <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-700" 
-                             style="width: {{ $currentIndex <= 0 ? '10%' : (($currentIndex / 4) * 100) . '%' }};"></div>
-                    </div>
-
-                    <!-- Steps Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 relative z-10">
+                <!-- Horizontal Stepper Row (Always 1 Row, Compact & Connected) -->
+                <div class="overflow-x-auto pb-1 -mb-1">
+                    <div class="min-w-[480px] sm:min-w-0 flex items-center justify-between relative px-2">
                         @foreach($stepList as $idx => $step)
                             @php
                                 $isCompleted = $currentIndex > $idx;
                                 $isCurrent = $currentIndex === $idx;
                                 $isPending = $currentIndex < $idx;
                             @endphp
-                            <div class="flex flex-col items-center text-center">
-                                <!-- Step Circle Node -->
-                                <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-xs transition-all duration-300 shadow-md mb-2
+
+                            <!-- Node + Label -->
+                            <div class="flex flex-col items-center relative z-10 w-20 text-center">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all duration-300 shadow-sm mb-1.5
                                     {{ $isCompleted ? 'bg-emerald-500 text-white shadow-emerald-500/30' : '' }}
-                                    {{ $isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-200 shadow-indigo-500/40 animate-pulse' : '' }}
-                                    {{ $isPending ? 'bg-white border-2 border-slate-200 text-slate-400 shadow-slate-200/50' : '' }}">
+                                    {{ $isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-100 shadow-indigo-500/40 animate-pulse' : '' }}
+                                    {{ $isPending ? 'bg-white border-2 border-slate-200 text-slate-400' : '' }}">
                                     @if($isCompleted)
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                    @elseif($isCurrent)
-                                        <span class="text-sm font-extrabold">{{ $idx + 1 }}</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                     @else
-                                        <span class="text-xs">{{ $idx + 1 }}</span>
+                                        <span>{{ $idx + 1 }}</span>
                                     @endif
                                 </div>
-
-                                <!-- Step Text -->
-                                <span class="text-xs font-bold {{ $isCurrent ? 'text-indigo-600' : ($isCompleted ? 'text-slate-800' : 'text-slate-400') }}">
+                                <span class="text-[11px] font-bold truncate max-w-full {{ $isCurrent ? 'text-indigo-600' : ($isCompleted ? 'text-slate-800' : 'text-slate-400') }}">
                                     {{ $step['label'] }}
                                 </span>
-                                <span class="text-[10px] text-slate-400 mt-0.5 hidden sm:block">
-                                    {{ $step['desc'] }}
-                                </span>
                             </div>
+
+                            <!-- Connecting Line between nodes -->
+                            @if($idx < count($stepList) - 1)
+                                <div class="flex-1 h-1 mx-1 rounded-full relative -top-3 z-0 {{ $currentIndex > $idx ? 'bg-emerald-500' : ($currentIndex === $idx ? 'bg-gradient-to-r from-indigo-500 to-slate-200' : 'bg-slate-200') }} transition-all duration-500"></div>
+                            @endif
                         @endforeach
                     </div>
                 </div>
@@ -262,4 +249,5 @@
         </div>
     </div>
 </div>
+
 
