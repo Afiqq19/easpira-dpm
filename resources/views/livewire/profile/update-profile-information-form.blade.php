@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
@@ -13,9 +12,6 @@ new class extends Component
     public string $nim = '';
     public string $prodi = '';
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
         $user = Auth::user();
@@ -25,18 +21,15 @@ new class extends Component
         $this->prodi = $user->prodi ?? '';
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
 
-        $validated = $this->validate([
+        $this->validate([
             'nama'  => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
             'nim'   => ['nullable', 'string', 'max:30'],
             'prodi' => ['nullable', 'string', 'max:100'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ], [
             'nama.required' => 'Nama lengkap wajib diisi.',
             'email.required' => 'Alamat email wajib diisi.',
@@ -45,8 +38,13 @@ new class extends Component
 
         $user->nama = $this->nama;
         $user->name = $this->nama;
-        $user->nim = $this->nim;
-        $user->prodi = $this->prodi;
+        
+        // Simpan NIM & Prodi jika role mahasiswa
+        if ($user->hasRole('mahasiswa') || !$user->hasAnyRole(['admin', 'staff_dewan'])) {
+            $user->nim = $this->nim;
+            $user->prodi = $this->prodi;
+        }
+
         $user->email = $this->email;
         $user->save();
 
@@ -56,10 +54,21 @@ new class extends Component
 }; ?>
 
 <div class="space-y-6">
+    @php
+        $user = Auth::user();
+        $isStaffOrAdmin = $user->hasAnyRole(['admin', 'staff_dewan']);
+    @endphp
+
     <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div>
             <h3 class="text-base font-bold text-slate-800">Biodata & Informasi Akun</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Perbarui nama lengkap, NIM, dan program studi Anda.</p>
+            <p class="text-xs text-slate-500 mt-0.5">
+                @if($isStaffOrAdmin)
+                    Perbarui nama lengkap dan informasi akun Anda.
+                @else
+                    Perbarui nama lengkap, NIM, dan program studi Anda.
+                @endif
+            </p>
         </div>
         <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
@@ -87,7 +96,7 @@ new class extends Component
                 @error('nama') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
             </div>
 
-            <!-- Email Kampus -->
+            <!-- Email Kampus / Akun -->
             <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                     Email Akun
@@ -105,29 +114,32 @@ new class extends Component
                 @error('email') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
             </div>
 
-            <!-- NIM -->
-            <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Nomor Induk Mahasiswa (NIM)
-                </label>
-                <div class="relative">
-                    <input wire:model="nim" type="text" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Contoh: 2205011001">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+            <!-- NIM & Prodi (Hanya Ditampilkan untuk Mahasiswa) -->
+            @if(!$isStaffOrAdmin)
+                <!-- NIM -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Nomor Induk Mahasiswa (NIM)
+                    </label>
+                    <div class="relative">
+                        <input wire:model="nim" type="text" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Contoh: 2205011001">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                    </div>
+                    @error('nim') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
                 </div>
-                @error('nim') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
-            </div>
 
-            <!-- Program Studi -->
-            <div>
-                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                    Program Studi / Jurusan
-                </label>
-                <div class="relative">
-                    <input wire:model="prodi" type="text" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Contoh: Teknik Komputer / TI">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                <!-- Program Studi -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Program Studi / Jurusan
+                    </label>
+                    <div class="relative">
+                        <input wire:model="prodi" type="text" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Contoh: Teknik Komputer / TI">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    @error('prodi') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
                 </div>
-                @error('prodi') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
-            </div>
+            @endif
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
