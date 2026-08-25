@@ -37,6 +37,31 @@ class DetailPengaduan extends Component
         $this->identitasPelapor = null;
     }
 
+    public function ubahStatus($status)
+    {
+        $validStatuses = ['diterima', 'diverifikasi', 'diproses', 'ditindaklanjuti', 'selesai', 'ditolak'];
+        if (!in_array($status, $validStatuses)) return;
+
+        $this->pengaduan->status = $status;
+        $this->pengaduan->save();
+        $this->status_baru = $status;
+        $this->pengaduan->refresh();
+
+        $this->catatLogSensitif('update_status', $this->pengaduan, [
+            'ticket_code' => $this->ticket_code,
+            'status_baru' => $status,
+        ]);
+
+        session()->flash('success_status', 'Status berhasil diperbarui menjadi ' . strtoupper($status) . '!');
+    }
+
+    public function updatedStatusBaru()
+    {
+        if ($this->status_baru !== $this->pengaduan->status) {
+            $this->ubahStatus($this->status_baru);
+        }
+    }
+
     public function bukaIdentitasDarurat(EnkripsiIdentitasService $enkripsiService)
     {
         // Hanya admin yang boleh melakukan ini
@@ -98,21 +123,6 @@ class DetailPengaduan extends Component
         $this->isi_tanggapan = '';
         $this->pengaduan->refresh();
         session()->flash('success_tanggapan', 'Tanggapan berhasil dikirim!');
-    }
-
-    public function updatedStatusBaru()
-    {
-        if ($this->status_baru !== $this->pengaduan->status) {
-            $this->pengaduan->status = $this->status_baru;
-            $this->pengaduan->save();
-
-            $this->catatLogSensitif('update_status', $this->pengaduan, [
-                'ticket_code' => $this->ticket_code,
-                'status_baru' => $this->status_baru,
-            ]);
-
-            session()->flash('success_status', 'Status berhasil diperbarui menjadi ' . strtoupper($this->status_baru) . '!');
-        }
     }
 
     public function render()
