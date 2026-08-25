@@ -198,8 +198,15 @@
                 @if($fotos)
                     <div class="mt-4 grid grid-cols-3 gap-3">
                         @foreach($fotos as $foto)
-                            <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-sm aspect-square bg-slate-100">
-                                <img src="{{ $foto->temporaryUrl() }}" class="w-full h-full object-cover">
+                            <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-sm aspect-square bg-slate-100 flex items-center justify-center">
+                                @if(method_exists($foto, 'isPreviewable') && $foto->isPreviewable())
+                                    <img src="{{ $foto->temporaryUrl() }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="p-3 text-center flex flex-col items-center justify-center">
+                                        <svg class="w-8 h-8 text-indigo-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        <span class="text-[10px] font-bold text-slate-700 truncate max-w-full block">{{ method_exists($foto, 'getClientOriginalName') ? $foto->getClientOriginalName() : 'File Lampiran' }}</span>
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
@@ -226,6 +233,7 @@
         </form>
     </div>
 </div>
+
 
 
 

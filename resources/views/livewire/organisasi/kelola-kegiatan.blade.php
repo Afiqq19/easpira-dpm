@@ -178,8 +178,14 @@
                                         <div wire:loading wire:target="poster" class="text-xs text-indigo-600 mt-2 font-medium">Mengunggah gambar...</div>
                                         
                                         @if ($poster)
-                                            <div class="mt-3 relative w-32 h-32 rounded-xl overflow-hidden border border-slate-200">
-                                                <img src="{{ $poster->temporaryUrl() }}" class="object-cover w-full h-full">
+                                            <div class="mt-3 relative w-32 h-32 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center bg-slate-100">
+                                                @if(method_exists($poster, 'isPreviewable') && $poster->isPreviewable())
+                                                    <img src="{{ $poster->temporaryUrl() }}" class="object-cover w-full h-full">
+                                                @else
+                                                    <div class="p-2 text-center text-xs text-slate-600">
+                                                        {{ method_exists($poster, 'getClientOriginalName') ? $poster->getClientOriginalName() : 'File Poster' }}
+                                                    </div>
+                                                @endif
                                             </div>
                                         @elseif($old_poster)
                                             <div class="mt-3 relative w-32 h-32 rounded-xl overflow-hidden border border-slate-200">
@@ -273,3 +279,4 @@
         </div>
     @endif
 </div>
+

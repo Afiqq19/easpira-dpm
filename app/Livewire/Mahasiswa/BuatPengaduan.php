@@ -40,11 +40,10 @@ class BuatPengaduan extends Component
             'kategori_lainnya' => 'nullable|string|max:100',
             'isi'              => 'required|string|min:20',
             'fotos'            => 'nullable|array|max:3',
-            'fotos.*'          => 'image|max:6144',
+            'fotos.*'          => 'max:10240', // Max 10MB per file (mendukung berbagai format foto termasuk HEIC/iPhone)
         ], [
             'isi.min'          => 'Isi pengaduan minimal 20 karakter untuk kejelasan.',
             'fotos.max'        => 'Maksimal hanya boleh mengunggah 3 foto.',
-            'fotos.*.image'    => 'File harus berupa gambar.',
             'fotos.*.max'      => 'Ukuran setiap foto maksimal 10MB.',
         ]);
 
@@ -52,8 +51,7 @@ class BuatPengaduan extends Component
         
         // Jika kategori Lainnya, tambahkan keterangan ke isi
         if ($kategori && strtolower($kategori->nama_kategori) === 'lainnya' && !empty($this->kategori_lainnya)) {
-            $this->isi = '[Kategori: ' . $this->kategori_lainnya . "]
-" . $this->isi;
+            $this->isi = "[Kategori: " . $this->kategori_lainnya . "]\n" . $this->isi;
         }
         
         $penanganan_khusus = $kategori->level_sensitivitas === 'tinggi' ? 1 : 0;
@@ -70,21 +68,37 @@ class BuatPengaduan extends Component
             $manager = new ImageManager(new Driver());
             
             foreach ($this->fotos as $foto) {
-                $filename = uniqid('lampiran_') . '.jpg';
-                $path = 'public/lampiran/' . $ticketCode . '/' . $filename;
-                $fullPath = storage_path('app/' . $path);
+                $ext = strtolower($foto->getClientOriginalExtension() ?: 'jpg');
+                $filename = uniqid('lampiran_') . '.' . $ext;
+                $storageDir = 'public/lampiran/' . $ticketCode;
+                $fullDir = storage_path('app/' . $storageDir);
                 
                 // Pastikan direktori ada
-                if (!file_exists(dirname($fullPath))) {
-                    mkdir(dirname($fullPath), 0755, true);
+                if (!file_exists($fullDir)) {
+                    mkdir($fullDir, 0755, true);
                 }
 
-                // Kompresi jika lebih dari 10MB (meskipun validasi mencegah lebih dari 10MB, kita tetap scale down ukurannya agar hemat server)
-                $image = $manager->read($foto->getRealPath());
-                $image->scaleDown(width: 1280); // Kecilkan resolusi
-                $image->toJpeg(80)->save($fullPath); // Simpan sebagai JPG dengan quality 80%
+                $saved = false;
+                // Coba kompresi jika format gambar standar
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                    try {
+                        $jpgName = uniqid('lampiran_') . '.jpg';
+                        $fullPath = $fullDir . '/' . $jpgName;
+                        $image = $manager->read($foto->getRealPath());
+                        $image->scaleDown(width: 1280); // Kecilkan resolusi
+                        $image->toJpeg(80)->save($fullPath);
+                        $lampiranPaths[] = 'lampiran/' . $ticketCode . '/' . $jpgName;
+                        $saved = true;
+                    } catch (\Throwable $e) {
+                        $saved = false;
+                    }
+                }
 
-                $lampiranPaths[] = str_replace('public/', '', $path);
+                // Fallback simpan file aslinya (misal HEIC, PDF, dll)
+                if (!$saved) {
+                    $stored = $foto->storeAs($storageDir, $filename);
+                    $lampiranPaths[] = str_replace('public/', '', $stored);
+                }
             }
         }
 
@@ -120,6 +134,3 @@ class BuatPengaduan extends Component
         return redirect()->route('mahasiswa.pengaduan.index');
     }
 }
-
-
-
