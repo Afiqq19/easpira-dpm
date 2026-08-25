@@ -9,7 +9,7 @@
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center p-1.5 shadow-md shadow-indigo-500/20 border border-indigo-200/50 flex-shrink-0">
                 <img src="{{ asset('images/icon_dpm.png') }}" class="w-full h-full object-contain filter drop-shadow" alt="Logo DPM">
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col notranslate" translate="no">
                 <span class="font-heading font-extrabold text-slate-800 text-base tracking-tight leading-none">
                     e-Aspira <span class="text-indigo-600">DPM</span>
                 </span>
@@ -172,4 +172,5 @@
         </button>
     </div>
 </div>
+
 
