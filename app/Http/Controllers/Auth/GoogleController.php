@@ -5,60 +5,48 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\URL;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class GoogleController extends Controller
 {
-    /**
-     * Redirect the user to the Google authentication page.
-     * Menggunakan URL dinamis agar selalu cocok dengan domain saat ini.
-     */
     public function redirect()
     {
-        // Paksa redirect URI menggunakan APP_URL yang aktif saat ini
         $redirectUri = url('/auth/google/callback');
-
         return Socialite::driver('google')
             ->redirectUrl($redirectUri)
             ->with(['prompt' => 'select_account'])
             ->redirect();
     }
 
-    /**
-     * Obtain the user information from Google.
-     */
     public function callback()
     {
         try {
-            // Paksa redirect URI sama dengan saat redirect agar tidak mismatch
             $redirectUri = url('/auth/google/callback');
-
             $googleUser = Socialite::driver('google')
                 ->redirectUrl($redirectUri)
                 ->user();
 
-            // KUNCI: Wajib email kampus @students.polmed.ac.id
+            // Wajib email kampus
             if (!Str::endsWith($googleUser->getEmail(), '@students.polmed.ac.id')) {
                 return redirect()->route('login', ['oauth_error' => 'not_polmed']);
             }
 
-            // Cek apakah user dengan google_id ini sudah ada
+            // Pastikan role mahasiswa ada (auto-create jika belum di DB)
+            Role::firstOrCreate(['name' => 'mahasiswa', 'guard_name' => 'web']);
+
+            // Cari user by google_id dulu
             $user = User::where('google_id', $googleUser->getId())->first();
 
             if (!$user) {
-                // Jika belum, cek apakah emailnya sudah terdaftar
                 $user = User::where('email', $googleUser->getEmail())->first();
-
                 if ($user) {
-                    // Update user yang sudah ada dengan google_id
                     $user->update([
                         'google_id' => $googleUser->getId(),
                         'avatar'    => $googleUser->getAvatar(),
                     ]);
                 } else {
-                    // Buat user baru secara otomatis
                     $user = User::create([
                         'name'      => $googleUser->getName(),
                         'nama'      => $googleUser->getName(),
@@ -70,28 +58,28 @@ class GoogleController extends Controller
                         'prodi'     => null,
                         'is_active' => true,
                     ]);
-
-                    // Assign role mahasiswa secara default
-                    $user->assignRole('mahasiswa');
                 }
             }
 
-            // Login user
+            // FIX: Jika user tidak punya role sama sekali, beri role mahasiswa
+            if ($user->roles->isEmpty()) {
+                $user->assignRole('mahasiswa');
+            }
+
             Auth::login($user, true);
 
-            // Redirect ke dashboard sesuai role
-            if ($user->isAdmin()) {
+            if ($user->hasRole('admin')) {
                 return redirect()->route('admin.dashboard');
-            } elseif ($user->isStaffDewan()) {
+            } elseif ($user->hasRole('staff_dewan')) {
                 return redirect()->route('dewan.dashboard');
-            } elseif ($user->isHMPS() || $user->isUKM()) {
+            } elseif ($user->hasRole('hmps') || $user->hasRole('ukm')) {
                 return redirect()->route('organisasi.dashboard');
             }
 
             return redirect()->route('mahasiswa.dashboard');
 
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Gagal login dengan Google: ' . $e->getMessage());
+            return redirect()->route('login')->with('error', 'Gagal login Google: ' . $e->getMessage());
         }
     }
 }
