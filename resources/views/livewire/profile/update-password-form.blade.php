@@ -18,13 +18,29 @@ new class extends Component
     public function updatePassword(): void
     {
         try {
-            $validated = $this->validate([
-                'current_password' => ['required', 'string', 'current_password'],
-                'password' => ['required', 'string', Password::defaults(), 'confirmed'],
-            ]);
+            $user = Auth::user();
+            
+            // Jika user login Google tanpa password lama, izinkan set password baru langsung
+            if ($user->password) {
+                $validated = $this->validate([
+                    'current_password' => ['required', 'string', 'current_password'],
+                    'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+                ], [
+                    'current_password.required' => 'Password saat ini wajib diisi.',
+                    'current_password.current_password' => 'Password saat ini tidak sesuai.',
+                    'password.required' => 'Password baru wajib diisi.',
+                    'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                ]);
+            } else {
+                $validated = $this->validate([
+                    'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+                ], [
+                    'password.required' => 'Password baru wajib diisi.',
+                    'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                ]);
+            }
         } catch (ValidationException $e) {
             $this->reset('current_password', 'password', 'password_confirmation');
-
             throw $e;
         }
 
@@ -33,47 +49,83 @@ new class extends Component
         ]);
 
         $this->reset('current_password', 'password', 'password_confirmation');
-
         $this->dispatch('password-updated');
+        session()->flash('success_password', 'Kata sandi berhasil diperbarui!');
     }
 }; ?>
 
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
-        </p>
-    </header>
-
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+<div class="space-y-6">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input wire:model="current_password" id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+            <h3 class="text-base font-bold text-slate-800">Keamanan & Kata Sandi</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Pastikan akun Anda menggunakan kata sandi yang kuat.</p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+    </div>
+
+    @if (session()->has('success_password'))
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-2xl flex items-center gap-3 text-xs font-bold shadow-sm">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            {{ session('success_password') }}
+        </div>
+    @endif
+
+    <form wire:submit="updatePassword" class="space-y-4">
+        @if(Auth::user()->password)
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Password Saat Ini
+                </label>
+                <div class="relative">
+                    <input wire:model="current_password" type="password" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="••••••••">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                </div>
+                @error('current_password') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
+            </div>
+        @else
+            <div class="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl text-xs text-blue-700 font-medium flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Akun ini terdaftar via Google SSO. Anda dapat membuat kata sandi baru untuk login manual.
+            </div>
+        @endif
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Password Baru
+                </label>
+                <div class="relative">
+                    <input wire:model="password" type="password" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="••••••••">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                @error('password') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Konfirmasi Password Baru
+                </label>
+                <div class="relative">
+                    <input wire:model="password_confirmation" type="password" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="••••••••">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                @error('password_confirmation') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
+            </div>
         </div>
 
-        <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input wire:model="password" id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            <x-action-message class="me-3" on="password-updated">
-                {{ __('Saved.') }}
-            </x-action-message>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            <button type="submit" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2">
+                <span wire:loading.remove wire:target="updatePassword" class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Simpan Password Baru
+                </span>
+                <span wire:loading wire:target="updatePassword" class="flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Menyimpan...
+                </span>
+            </button>
         </div>
     </form>
-</section>
+</div>
