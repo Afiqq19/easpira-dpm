@@ -165,8 +165,8 @@
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0 ml-4">
-                            <input type="checkbox" wire:model.live="is_anonim" class="sr-only peer" {{ $is_anonim ? 'checked' : '' }}>
-                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                            <input type="checkbox" wire:model.live="is_anonim" class="sr-only peer" {{ $is_anonim ? 'checked' : ' }}>
+                            <div class="w-12 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-['] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                         </label>
                     </div>
                 @endif
@@ -175,9 +175,9 @@
             {{-- LANGKAH 3: Isi Laporan --}}
             <div class="glass rounded-3xl p-6 sm:p-8 border border-white/70 shadow-xl shadow-slate-200/50" x-data="{
                 insertTag(tag) {
-                    let current = @this.get(''isi'') || '''';
-                    if (current && !current.endsWith(''\n'')) current += ''\n'';
-                    @this.set(''isi'', current + tag + '': '');
+                    let current = @this.get('isi') || '';
+                    if (current && !current.endsWith('\n')) current += '\n';
+                    @this.set('isi', current + tag + ': ');
                 }
             }">
                 <div class="flex items-center justify-between gap-3 mb-4">
@@ -193,16 +193,16 @@
                 <!-- Format Suggestion Chips -->
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <span class="text-[11px] font-bold text-slate-400">Format Cepat:</span>
-                    <button type="button" @click="insertTag(''[Lokasi Kejadian]'')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
+                    <button type="button" @click="insertTag('[Lokasi Kejadian]')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
                         + Lokasi Kejadian
                     </button>
-                    <button type="button" @click="insertTag(''[Waktu / Tanggal]'')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
+                    <button type="button" @click="insertTag('[Waktu / Tanggal]')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
                         + Waktu / Tanggal
                     </button>
-                    <button type="button" @click="insertTag(''[Pihak Terkait]'')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
+                    <button type="button" @click="insertTag('[Pihak Terkait]')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
                         + Pihak Terkait
                     </button>
-                    <button type="button" @click="insertTag(''[Harapan Solusi]'')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
+                    <button type="button" @click="insertTag('[Harapan Solusi]')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 transition-colors border border-slate-200">
                         + Harapan Solusi
                     </button>
                 </div>
@@ -219,12 +219,12 @@
                 <div class="flex items-center justify-between mt-2">
                     <p class="text-xs text-slate-400">Minimal 20 karakter agar laporan dapat diverifikasi.</p>
                     @if($isi)
-                        <span class="text-xs font-mono font-bold {{ strlen($isi) >= 20 ? ''text-emerald-600'' : ''text-amber-500'' }}">
+                        <span class="text-xs font-mono font-bold {{ strlen($isi) >= 20 ? 'text-emerald-600' : 'text-amber-500' }}">
                             {{ strlen($isi) }} Karakter
                         </span>
                     @endif
                 </div>
-                @error(''isi'') <p class="text-xs text-rose-500 mt-1 font-bold">{{ $message }}</p> @enderror
+                @error('isi') <p class="text-xs text-rose-500 mt-1 font-bold">{{ $message }}</p> @enderror
             </div>
 
             {{-- LANGKAH 4: Lampiran Foto / Bukti --}}
@@ -340,6 +340,7 @@
         </form>
     </div>
 </div>
+
 
 
 

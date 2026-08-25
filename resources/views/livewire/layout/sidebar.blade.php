@@ -13,7 +13,7 @@
                 <span class="font-heading font-extrabold text-slate-800 text-base tracking-tight leading-none">
                     e-Aspira <span class="text-indigo-600">DPM</span>
                 </span>
-                <span class="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-1">Polmed Official</span>
+                <span class="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-1">DPM POLMED</span>
             </div>
         </div>
         <!-- Close button (Mobile Only) -->
@@ -172,3 +172,4 @@
         </button>
     </div>
 </div>
+

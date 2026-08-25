@@ -158,7 +158,8 @@ Route::get('/update-rahasia-dpm', function () {
     // Pakai --no-interaction agar composer tidak nyangkut minta konfirmasi
     $output3 = shell_exec("cd \"$repoDir\" && composer install --no-interaction --prefer-dist --optimize-autoloader 2>&1");
     $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
-      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
+      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder
+            Artisan::call('db:seed', ['--class' => 'KategoriPengaduanSeeder', '--force' => true]); --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
     $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
@@ -212,7 +213,8 @@ Route::get('/update-rahasia-mss', function () {
     $output2 = shell_exec("cd \"$repoDir\" && \"$gitPath\" reset --hard origin/main 2>&1");
     $output3 = shell_exec("cd \"$repoDir\" && composer install 2>&1");
     $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
-      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
+      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder
+            Artisan::call('db:seed', ['--class' => 'KategoriPengaduanSeeder', '--force' => true]); --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
     $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
@@ -308,6 +310,7 @@ Route::get('/cek-log-error', function () {
     return '<pre style="background:#1a1a1a;color:#ff6b6b;padding:20px;font-size:11px;white-space:pre-wrap;">' 
         . htmlspecialchars(implode('', $lines)) . '</pre>';
 });
+
 
 
 

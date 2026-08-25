@@ -21,15 +21,22 @@ class BuatPengaduan extends Component
     public $kategori_id;
     public $kategori_lainnya = '';
     public $isi;
-    public bool $is_anonim = false; // true = anonim, false = umum
+    public bool $is_anonim = false;
     
-    // Properti untuk upload foto
     public $fotos = [];
 
     public function render()
     {
+        $kategoriList = KategoriPengaduan::all();
+        if ($kategoriList->isEmpty()) {
+            if (class_exists(\Database\Seeders\KategoriPengaduanSeeder::class)) {
+                (new \Database\Seeders\KategoriPengaduanSeeder())->run();
+                $kategoriList = KategoriPengaduan::all();
+            }
+        }
+
         return view('livewire.mahasiswa.buat-pengaduan', [
-            'kategoriList' => KategoriPengaduan::all(),
+            'kategoriList' => $kategoriList,
         ]);
     }
 
@@ -40,7 +47,7 @@ class BuatPengaduan extends Component
             'kategori_lainnya' => 'nullable|string|max:100',
             'isi'              => 'required|string|min:20',
             'fotos'            => 'nullable|array|max:3',
-            'fotos.*'          => 'max:15360', // Max 15MB per file
+            'fotos.*'          => 'max:15360',
         ], [
             'isi.min'          => 'Isi pengaduan minimal 20 karakter untuk kejelasan.',
             'fotos.max'        => 'Maksimal hanya boleh mengunggah 3 foto.',
@@ -49,20 +56,15 @@ class BuatPengaduan extends Component
 
         $kategori = KategoriPengaduan::find($this->kategori_id);
         
-        // Jika kategori Lainnya, tambahkan keterangan ke isi
         if ($kategori && strtolower($kategori->nama_kategori) === 'lainnya' && !empty($this->kategori_lainnya)) {
             $this->isi = "[Kategori: " . $this->kategori_lainnya . "]\n" . $this->isi;
         }
         
-        $penanganan_khusus = $kategori->level_sensitivitas === 'tinggi' ? 1 : 0;
-        
-        // Tentukan mode_privasi dari boolean
+        $penanganan_khusus = ($kategori && $kategori->level_sensitivitas === 'tinggi') ? 1 : 0;
         $mode_privasi = ($penanganan_khusus || $this->is_anonim) ? 'anonim' : 'umum';
 
-        // Generate Ticket Code (Format: PLP-2026-RANDOM)
         $ticketCode = 'PLP-' . date('Y') . '-' . strtoupper(substr(uniqid(), -4));
 
-        // Proses Upload & Kompresi Foto
         $lampiranPaths = [];
         if (!empty($this->fotos)) {
             $manager = new ImageManager(new Driver());
@@ -75,12 +77,11 @@ class BuatPengaduan extends Component
                 $ext = strtolower($foto->getClientOriginalExtension() ?: 'jpg');
                 $saved = false;
 
-                // Coba kompresi menjadi JPG
                 try {
                     $jpgName = uniqid('lampiran_') . '.jpg';
                     $fullPath = $publicDir . '/' . $jpgName;
                     $image = $manager->read($foto->getRealPath());
-                    $image->scaleDown(width: 1600); // Skala resolusi
+                    $image->scaleDown(width: 1600);
                     $image->toJpeg(85)->save($fullPath);
                     $lampiranPaths[] = 'lampiran/' . $ticketCode . '/' . $jpgName;
                     $saved = true;
@@ -88,7 +89,6 @@ class BuatPengaduan extends Component
                     $saved = false;
                 }
 
-                // Fallback simpan file aslinya ke disk 'public'
                 if (!$saved) {
                     $filename = uniqid('lampiran_') . '.' . $ext;
                     $stored = $foto->storeAs('lampiran/' . $ticketCode, $filename, 'public');
@@ -105,7 +105,6 @@ class BuatPengaduan extends Component
         $pengaduan->status = 'diterima';
         $pengaduan->penanganan_khusus = $penanganan_khusus;
         
-        // Simpan lampiran sebagai JSON jika ada
         if (!empty($lampiranPaths)) {
             $pengaduan->lampiran = $lampiranPaths;
         }
@@ -116,7 +115,7 @@ class BuatPengaduan extends Component
             
             $enkripsiService->simpanIdentitas($pengaduan, [
                 'user_id' => Auth::id(),
-                'nama'    => Auth::user()->nama,
+                'nama'    => Auth::user()->nama ?? Auth::user()->name,
                 'nim'     => Auth::user()->nim,
                 'email'   => Auth::user()->email,
             ]);
