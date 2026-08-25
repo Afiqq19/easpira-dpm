@@ -15,6 +15,7 @@ class GoogleController extends Controller
     {
         $redirectUri = url('/auth/google/callback');
         return Socialite::driver('google')
+            ->stateless()
             ->redirectUrl($redirectUri)
             ->with(['prompt' => 'select_account'])
             ->redirect();
@@ -25,12 +26,18 @@ class GoogleController extends Controller
         try {
             $redirectUri = url('/auth/google/callback');
             $googleUser = Socialite::driver('google')
+                ->stateless()
                 ->redirectUrl($redirectUri)
                 ->user();
 
-            // Wajib email kampus
-            if (!Str::endsWith($googleUser->getEmail(), '@students.polmed.ac.id')) {
-                return redirect()->route('login', ['oauth_error' => 'not_polmed']);
+            $email = strtolower(trim($googleUser->getEmail() ?? ''));
+
+            // Validasi Domain Kampus Polmed (@students.polmed.ac.id atau @polmed.ac.id)
+            if (!Str::endsWith($email, ['@students.polmed.ac.id', '@polmed.ac.id'])) {
+                return redirect()->route('login', [
+                    'oauth_error'    => 'not_polmed',
+                    'rejected_email' => $email
+                ]);
             }
 
             // Pastikan role mahasiswa ada (auto-create jika belum di DB)
@@ -40,7 +47,7 @@ class GoogleController extends Controller
             $user = User::where('google_id', $googleUser->getId())->first();
 
             if (!$user) {
-                $user = User::where('email', $googleUser->getEmail())->first();
+                $user = User::where('email', $email)->first();
                 if ($user) {
                     $user->update([
                         'google_id' => $googleUser->getId(),
@@ -50,7 +57,7 @@ class GoogleController extends Controller
                     $user = User::create([
                         'name'      => $googleUser->getName(),
                         'nama'      => $googleUser->getName(),
-                        'email'     => $googleUser->getEmail(),
+                        'email'     => $email,
                         'google_id' => $googleUser->getId(),
                         'avatar'    => $googleUser->getAvatar(),
                         'password'  => null,
@@ -61,7 +68,7 @@ class GoogleController extends Controller
                 }
             }
 
-            // FIX: Jika user tidak punya role sama sekali, beri role mahasiswa
+            // Jika user belum punya role, beri role mahasiswa
             if ($user->roles->isEmpty()) {
                 $user->assignRole('mahasiswa');
             }
@@ -78,8 +85,8 @@ class GoogleController extends Controller
 
             return redirect()->route('mahasiswa.dashboard');
 
-        } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Gagal login Google: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->route('login')->with('error', 'Gagal memproses login Google: ' . $e->getMessage());
         }
     }
 }

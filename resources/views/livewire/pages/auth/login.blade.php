@@ -39,10 +39,23 @@ new #[Layout('layouts.guest')] class extends Component
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    @if (session('error') || request()->query('oauth_error') == 'not_polmed')
+    @if (request()->query('oauth_error') == 'not_polmed')
         <div class="mb-6 bg-rose-50 text-rose-600 px-4 py-3 rounded-xl border border-rose-200 shadow-sm font-medium flex items-start gap-3">
             <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-            <p class="text-sm leading-relaxed">Akses Ditolak! Anda wajib menggunakan akun email kampus (@students.polmed.ac.id). Email biasa tidak diizinkan.</p>
+            <div>
+                <p class="text-sm font-bold leading-tight">Akses Ditolak: Email Bukan Domain Kampus</p>
+                <p class="text-xs text-rose-500 mt-1 leading-relaxed">
+                    Anda wajib login menggunakan email resmi Polmed (<strong class="text-rose-700 font-mono">@students.polmed.ac.id</strong> atau <strong class="text-rose-700 font-mono">@polmed.ac.id</strong>).
+                    @if(request()->query('rejected_email'))
+                        <br><span class="text-[11px] text-slate-500">Email yang dipilih: {{ request()->query('rejected_email') }}</span>
+                    @endif
+                </p>
+            </div>
+        </div>
+    @elseif (session('error'))
+        <div class="mb-6 bg-rose-50 text-rose-600 px-4 py-3 rounded-xl border border-rose-200 shadow-sm font-medium flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <p class="text-sm leading-relaxed">{{ session('error') }}</p>
         </div>
     @endif
 
@@ -111,3 +124,4 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
     </form>
 </div>
+
