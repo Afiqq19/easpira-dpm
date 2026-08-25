@@ -139,6 +139,10 @@ Route::get('/update-rahasia-dpm', function () {
       if (file_exists($envFile)) {
           $env = file_get_contents($envFile);
           $env = preg_replace('/^APP_URL=.*/m', 'APP_URL=https://easpira-dpm.xie.my.id', $env);
+            $env = preg_replace('/^APP_TIMEZONE=.*/m', 'APP_TIMEZONE=Asia/Jakarta', $env);
+            if (!str_contains($env, 'APP_TIMEZONE=')) {
+                $env .= "\nAPP_TIMEZONE=Asia/Jakarta\n";
+            }
           $env = preg_replace('/^APP_ENV=.*/m', 'APP_ENV=production', $env);
           $env = preg_replace('/^APP_DEBUG=.*/m', 'APP_DEBUG=false', $env);
           $env = preg_replace('/^GOOGLE_REDIRECT_URI=.*/m', 'GOOGLE_REDIRECT_URI=https://easpira-dpm.xie.my.id/auth/google/callback', $env);
@@ -304,5 +308,6 @@ Route::get('/cek-log-error', function () {
     return '<pre style="background:#1a1a1a;color:#ff6b6b;padding:20px;font-size:11px;white-space:pre-wrap;">' 
         . htmlspecialchars(implode('', $lines)) . '</pre>';
 });
+
 
 

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,9 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        config(['app.timezone' => 'Asia/Jakarta']);
+        date_default_timezone_set('Asia/Jakarta');
+        Carbon::setLocale('id');
+
         if (str_contains(request()->getHost(), 'xie.my.id')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
 }
-
