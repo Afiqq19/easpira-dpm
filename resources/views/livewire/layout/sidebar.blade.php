@@ -1,5 +1,5 @@
 <div x-cloak :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'" 
-     class="fixed md:relative inset-y-0 left-0 w-72 md:w-64 flex flex-col h-screen z-40 
+     style="background: linear-gradient(180deg, #0B0F19 0%, #0F172A 50%, #090D16 100%) !important;" class="fixed md:relative inset-y-0 left-0 w-72 md:w-64 flex flex-col h-screen z-40 bg-slate-900 
             transition-transform duration-300 ease-in-out
             bg-gradient-to-b from-[#0B0F19] via-[#0F172A] to-[#090D16] border-r border-white/[0.08] shadow-2xl shrink-0 select-none">
 
@@ -172,4 +172,5 @@
         </button>
     </div>
 </div>
+
 
