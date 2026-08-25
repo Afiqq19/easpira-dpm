@@ -43,7 +43,7 @@
                 </p>
                 <div class="flex items-center gap-1.5 mt-0.5">
                     <span class="text-[10px] font-bold text-indigo-400 capitalize truncate">
-                        {{ auth()->user()->roles->first()->name ?? 'Pengguna' }}
+                        {{ auth()->user()->roles->first()?->name ?? 'Pengguna' }}
                     </span>
                     @if(auth()->user()->google_id)
                         <span class="w-1 h-1 rounded-full bg-slate-600"></span>
@@ -172,3 +172,4 @@
         </button>
     </div>
 </div>
+
