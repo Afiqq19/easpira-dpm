@@ -1,46 +1,108 @@
 <div>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('mahasiswa.pengaduan.index') }}" wire:navigate class="p-2 rounded-lg bg-white/60 hover:bg-white text-slate-500 hover:text-indigo-600 transition-colors shadow-sm">
+            <a href="{{ route('mahasiswa.pengaduan.index') }}" wire:navigate class="p-2 rounded-xl bg-white/80 hover:bg-white text-slate-500 hover:text-indigo-600 transition-all shadow-sm border border-slate-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
             </a>
             <div>
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold tracking-wider mr-2 uppercase">Detail Tiket</span>
-                <span class="font-bold text-slate-800">{{ $pengaduan->ticket_code }}</span>
+                <span class="font-mono font-bold text-slate-800">{{ $pengaduan->ticket_code }}</span>
             </div>
         </div>
     </x-slot>
 
     <div class="max-w-5xl mx-auto space-y-6">
-        <!-- Status Tracker Bar -->
-        <div class="glass p-6 rounded-3xl shadow-lg border border-white/60">
+        <!-- Status Tracker Bar Modern -->
+        <div class="glass p-6 md:p-8 rounded-3xl shadow-lg border border-white/60">
             @php
+                $stepList = [
+                    ['key' => 'diterima', 'label' => 'Diterima', 'desc' => 'Laporan masuk'],
+                    ['key' => 'diverifikasi', 'label' => 'Diverifikasi', 'desc' => 'Pemeriksaan awal'],
+                    ['key' => 'diproses', 'label' => 'Diproses', 'desc' => 'Ditangani komisi'],
+                    ['key' => 'ditindaklanjuti', 'label' => 'Tindak Lanjut', 'desc' => 'Aksi lapangan'],
+                    ['key' => 'selesai', 'label' => 'Selesai', 'desc' => 'Kasus tuntas'],
+                ];
                 $statuses = ['diterima', 'diverifikasi', 'diproses', 'ditindaklanjuti', 'selesai'];
                 $currentIndex = array_search($pengaduan->status, $statuses);
-                if($pengaduan->status === 'ditolak') $currentIndex = -1;
+                if ($currentIndex === false) {
+                    $currentIndex = ($pengaduan->status === 'ditolak') ? -1 : 0;
+                }
             @endphp
             
-            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">Status Penanganan</h3>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Status Penanganan Aspirasi
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Alur proses verifikasi dan tindak lanjut laporan Anda oleh DPM</p>
+                </div>
+                @php
+                    $badgeStyles = [
+                        'diterima' => 'bg-blue-50 text-blue-700 border-blue-200',
+                        'diverifikasi' => 'bg-amber-50 text-amber-700 border-amber-200',
+                        'diproses' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                        'ditindaklanjuti' => 'bg-purple-50 text-purple-700 border-purple-200',
+                        'selesai' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                        'ditolak' => 'bg-rose-50 text-rose-700 border-rose-200',
+                    ];
+                    $badgeStyle = $badgeStyles[$pengaduan->status] ?? 'bg-slate-50 text-slate-700 border-slate-200';
+                @endphp
+                <span class="self-start sm:self-auto px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border {{ $badgeStyle }} shadow-sm">
+                    Status: {{ $pengaduan->status }}
+                </span>
+            </div>
             
             @if($pengaduan->status === 'ditolak')
-                <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
-                    <div class="flex items-center gap-3 text-rose-700 font-bold mb-2">
+                <div class="p-5 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        Pengaduan Ditolak
                     </div>
-                    <p class="text-sm text-rose-600 font-medium">Alasan: {{ $pengaduan->alasan_penolakan ?? 'Tidak memenuhi syarat pengaduan.' }}</p>
+                    <div>
+                        <h4 class="text-sm font-bold text-rose-800 mb-1">Pengaduan Ditolak</h4>
+                        <p class="text-xs text-rose-700 leading-relaxed font-medium">Alasan: {{ $pengaduan->alasan_penolakan ?? 'Pengaduan tidak memenuhi syarat verifikasi atau duplikasi.' }}</p>
+                    </div>
                 </div>
             @else
-                <div class="relative">
-                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-slate-200">
-                        <div style="width: {{ ($currentIndex / 4) * 100 }}%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500 transition-all duration-1000"></div>
+                <div class="relative py-2">
+                    <!-- Progress Bar Background Track (Desktop) -->
+                    <div class="hidden sm:block absolute top-1/2 left-8 right-8 -translate-y-5 h-1.5 bg-slate-200 rounded-full z-0">
+                        <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-700" 
+                             style="width: {{ $currentIndex <= 0 ? '10%' : (($currentIndex / 4) * 100) . '%' }};"></div>
                     </div>
-                    <div class="flex justify-between text-xs font-semibold text-slate-500">
-                        <div class="text-center w-1/5 {{ $currentIndex >= 0 ? 'text-indigo-600' : '' }}">Diterima</div>
-                        <div class="text-center w-1/5 {{ $currentIndex >= 1 ? 'text-indigo-600' : '' }}">Diverifikasi</div>
-                        <div class="text-center w-1/5 {{ $currentIndex >= 2 ? 'text-indigo-600' : '' }}">Diproses</div>
-                        <div class="text-center w-1/5 {{ $currentIndex >= 3 ? 'text-indigo-600' : '' }}">Tindak Lanjut</div>
-                        <div class="text-center w-1/5 {{ $currentIndex >= 4 ? 'text-emerald-600' : '' }}">Selesai</div>
+
+                    <!-- Steps Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 relative z-10">
+                        @foreach($stepList as $idx => $step)
+                            @php
+                                $isCompleted = $currentIndex > $idx;
+                                $isCurrent = $currentIndex === $idx;
+                                $isPending = $currentIndex < $idx;
+                            @endphp
+                            <div class="flex flex-col items-center text-center">
+                                <!-- Step Circle Node -->
+                                <div class="w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-xs transition-all duration-300 shadow-md mb-2
+                                    {{ $isCompleted ? 'bg-emerald-500 text-white shadow-emerald-500/30' : '' }}
+                                    {{ $isCurrent ? 'bg-indigo-600 text-white ring-4 ring-indigo-200 shadow-indigo-500/40 animate-pulse' : '' }}
+                                    {{ $isPending ? 'bg-white border-2 border-slate-200 text-slate-400 shadow-slate-200/50' : '' }}">
+                                    @if($isCompleted)
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                    @elseif($isCurrent)
+                                        <span class="text-sm font-extrabold">{{ $idx + 1 }}</span>
+                                    @else
+                                        <span class="text-xs">{{ $idx + 1 }}</span>
+                                    @endif
+                                </div>
+
+                                <!-- Step Text -->
+                                <span class="text-xs font-bold {{ $isCurrent ? 'text-indigo-600' : ($isCompleted ? 'text-slate-800' : 'text-slate-400') }}">
+                                    {{ $step['label'] }}
+                                </span>
+                                <span class="text-[10px] text-slate-400 mt-0.5 hidden sm:block">
+                                    {{ $step['desc'] }}
+                                </span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             @endif
@@ -52,7 +114,7 @@
                 <!-- Data Pengaduan -->
                 <div class="glass p-6 md:p-8 rounded-3xl shadow-lg border border-white/60">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shadow-inner">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                         <div>
@@ -61,24 +123,48 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white/50 rounded-2xl p-5 border border-slate-100 mb-6">
+                    <div class="bg-white/70 rounded-2xl p-5 border border-slate-200/80 mb-6 shadow-sm">
                         <p class="text-slate-700 leading-relaxed whitespace-pre-wrap">{{ $pengaduan->isi }}</p>
                     </div>
                     
-                    <!-- Lampiran Foto -->
+                    <!-- Lampiran Foto / Bukti -->
                     @if($pengaduan->lampiran && is_array($pengaduan->lampiran) && count($pengaduan->lampiran) > 0)
                         <h4 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             Lampiran Bukti ({{ count($pengaduan->lampiran) }})
                         </h4>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($pengaduan->lampiran as $path)
-                                <a href="{{ asset('storage/' . $path) }}" target="_blank" class="block relative group overflow-hidden rounded-xl border border-slate-200 aspect-square">
-                                    <img src="{{ asset('storage/' . $path) }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
-                                    </div>
-                                </a>
+                                @php
+                                    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                    $isDirectImage = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']);
+                                    $fileUrl = asset('storage/' . $path);
+                                    $fileName = basename($path);
+                                @endphp
+                                
+                                <div class="relative group overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 transition-all hover:shadow-md">
+                                    @if($isDirectImage)
+                                        <a href="{{ $fileUrl }}" target="_blank" class="block aspect-square overflow-hidden bg-slate-100">
+                                            <img src="{{ $fileUrl }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" alt="Lampiran">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                <span class="text-xs font-bold">Lihat Foto</span>
+                                            </div>
+                                        </a>
+                                    @else
+                                        <div class="p-5 flex flex-col items-center justify-center text-center aspect-square">
+                                            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-3 shadow-inner">
+                                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            </div>
+                                            <span class="text-xs font-bold text-slate-800 truncate max-w-full block mb-1 uppercase tracking-wider font-mono">{{ $ext ?: 'FILE' }}</span>
+                                            <span class="text-[11px] text-slate-500 truncate max-w-full block mb-3">{{ $fileName }}</span>
+                                            <a href="{{ $fileUrl }}" target="_blank" download class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition-colors">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                                Buka / Unduh
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
                             @endforeach
                         </div>
                     @endif

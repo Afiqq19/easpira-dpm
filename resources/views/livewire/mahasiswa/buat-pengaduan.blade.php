@@ -190,22 +190,33 @@
                             <span wire:loading wire:target="fotos" class="text-indigo-600">Mengunggah...</span>
                         </p>
                     </div>
-                    <input id="file-upload" wire:model="fotos" type="file" class="sr-only" multiple accept="image/*">
+                    <input id="file-upload" wire:model="fotos" type="file" class="sr-only" multiple accept="image/*,.heic,.heif,.pdf">
                 </label>
                 @error('fotos') <p class="text-xs text-rose-500 mt-2 font-medium">{{ $message }}</p> @enderror
                 @error('fotos.*') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
 
                 @if($fotos)
-                    <div class="mt-4 grid grid-cols-3 gap-3">
-                        @foreach($fotos as $foto)
-                            <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-sm aspect-square bg-slate-100 flex items-center justify-center">
-                                @if(method_exists($foto, 'isPreviewable') && $foto->isPreviewable())
-                                    <img src="{{ $foto->temporaryUrl() }}" class="w-full h-full object-cover">
-                                @else
-                                    <div class="p-3 text-center flex flex-col items-center justify-center">
-                                        <svg class="w-8 h-8 text-indigo-500 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        <span class="text-[10px] font-bold text-slate-700 truncate max-w-full block">{{ method_exists($foto, 'getClientOriginalName') ? $foto->getClientOriginalName() : 'File Lampiran' }}</span>
+                    <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @foreach($fotos as $idx => $foto)
+                            @php
+                                $isPrev = method_exists($foto, 'isPreviewable') && $foto->isPreviewable();
+                                $name = method_exists($foto, 'getClientOriginalName') ? $foto->getClientOriginalName() : 'File ' . ($idx + 1);
+                                $ext = strtoupper(pathinfo($name, PATHINFO_EXTENSION) ?: 'FOTO');
+                            @endphp
+                            <div class="relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-sm aspect-square bg-slate-100 flex flex-col items-center justify-center p-2 group">
+                                @if($isPrev)
+                                    <img src="{{ $foto->temporaryUrl() }}" class="w-full h-full object-cover rounded-xl">
+                                    <div class="absolute bottom-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[9px] font-bold uppercase">
+                                        {{ $ext }}
                                     </div>
+                                @else
+                                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 shadow-inner">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    </div>
+                                    <span class="text-[11px] font-bold text-slate-800 truncate max-w-full px-2 text-center">{{ $name }}</span>
+                                    <span class="mt-1.5 inline-block text-[9px] font-bold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-md uppercase tracking-wider">
+                                        {{ $ext }} Terpilih
+                                    </span>
                                 @endif
                             </div>
                         @endforeach
@@ -233,6 +244,7 @@
         </form>
     </div>
 </div>
+
 
 
 
