@@ -87,7 +87,7 @@ new #[Layout('layouts.guest')] class extends Component
             <x-text-input wire:model="password" id="password" class="block mt-1 w-full border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/50 text-sm py-2.5"
                             type="password"
                             name="password"
-                            required autocomplete="new-password" placeholder="Minimal 8 karakter" />
+                            required autocomplete="new-password" placeholder="********" />
             <x-input-error :messages="$errors->get('password')" class="mt-2 text-rose-500" />
         </div>
 
@@ -96,7 +96,7 @@ new #[Layout('layouts.guest')] class extends Component
             <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" class="text-slate-700 font-medium" />
             <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white/50 text-sm py-2.5"
                             type="password"
-                            name="password_confirmation" required autocomplete="new-password" placeholder="Ulangi password Anda" />
+                            name="password_confirmation" required autocomplete="new-password" placeholder="********" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2 text-rose-500" />
         </div>
 
@@ -127,3 +127,4 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
     </form>
 </div>
+

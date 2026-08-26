@@ -79,7 +79,7 @@ new class extends Component
                     Password Saat Ini
                 </label>
                 <div class="relative">
-                    <input wire:model="current_password" :type="showCurrent ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Masukkan password saat ini">
+                    <input wire:model="current_password" :type="showCurrent ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="********">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                     
                     <!-- Tombol Intip Password -->
@@ -104,7 +104,7 @@ new class extends Component
                     Password Baru
                 </label>
                 <div class="relative">
-                    <input wire:model="password" :type="showNew ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Minimal 8 karakter">
+                    <input wire:model="password" :type="showNew ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="********">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     
                     <!-- Tombol Intip Password -->
@@ -122,7 +122,7 @@ new class extends Component
                     Konfirmasi Password Baru
                 </label>
                 <div class="relative">
-                    <input wire:model="password_confirmation" :type="showConfirm ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="Ulangi password baru">
+                    <input wire:model="password_confirmation" :type="showConfirm ? 'text' : 'password'" class="w-full rounded-2xl border-slate-200 bg-white/80 text-sm px-4 py-2.5 pl-10 pr-11 focus:border-indigo-500 focus:ring-indigo-500 text-slate-800 font-medium" placeholder="********">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     
                     <!-- Tombol Intip Password -->
@@ -149,3 +149,4 @@ new class extends Component
         </div>
     </form>
 </div>
+
