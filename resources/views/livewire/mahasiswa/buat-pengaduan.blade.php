@@ -34,7 +34,7 @@
                     @foreach($kategoriList as $kat)
                         @php
                             $namaKat = strtolower($kat->nama_kategori);
-                            $isSensitif = $kat->level_sensitivitas === 'tinggi' || str_contains($namaKat, 'pelecehan') || str_contains($namaKat, 'kekerasan');
+                            $isSensitif = in_array($kat->level_sensitivitas, ['sensitif', 'tinggi']) || str_contains($namaKat, 'pelecehan') || str_contains($namaKat, 'kekerasan');
                             $isSelected = $kategori_id == $kat->id;
                             
                             if (str_contains($namaKat, 'akademik') || str_contains($namaKat, 'kuliah') || str_contains($namaKat, 'nilai')) {
@@ -127,7 +127,15 @@
                     </div>
                 </div>
 
-                @if($selectedKategori && $selectedKategori->level_sensitivitas === 'tinggi')
+                @php
+                    $selectedIsSensitif = $selectedKategori && (
+                        in_array($selectedKategori->level_sensitivitas, ['sensitif', 'tinggi']) || 
+                        str_contains(strtolower($selectedKategori->nama_kategori), 'pelecehan') || 
+                        str_contains(strtolower($selectedKategori->nama_kategori), 'kekerasan')
+                    );
+                @endphp
+
+                @if($selectedIsSensitif)
                     {{-- Kasus Sensitif: Terkunci Anonim --}}
                     <div class="flex items-start gap-4 p-4 rounded-2xl bg-rose-50 border border-rose-200">
                         <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">

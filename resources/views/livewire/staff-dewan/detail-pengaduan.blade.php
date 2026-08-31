@@ -319,7 +319,7 @@
                                 <p class="text-xs text-slate-400 mt-2">Identitas pelapor dilindungi oleh sistem.</p>
                             </div>
                             
-                            @if(Auth::user()->hasRole('admin'))
+                            @if(Auth::user()->hasRole('admin') || Auth::user()->can('penanganan_kasus_sensitif'))
                                 <button wire:click="bukaIdentitasDarurat" 
                                         wire:confirm="PERHATIAN: Anda akan membuka identitas anonim pelapor. Tindakan ini akan dicatat dalam Log Aktivitas dan hanya boleh dilakukan untuk keperluan darurat/investigasi. Lanjutkan?" 
                                         class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 transition-all">

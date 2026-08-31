@@ -64,9 +64,9 @@ class DetailPengaduan extends Component
 
     public function bukaIdentitasDarurat(EnkripsiIdentitasService $enkripsiService)
     {
-        // Hanya admin yang boleh melakukan ini
-        if (!Auth::user()->hasRole('admin')) {
-            abort(403, 'Hanya Admin yang dapat membuka identitas anonim.');
+        // Hanya admin atau staff dengan izin kasus sensitif yang boleh melakukan ini
+        if (!Auth::user()->hasRole('admin') && !Auth::user()->can('penanganan_kasus_sensitif')) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk membuka identitas anonim.');
         }
 
         if ($this->pengaduan->mode_privasi === 'anonim') {

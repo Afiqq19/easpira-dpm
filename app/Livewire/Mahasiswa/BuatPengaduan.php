@@ -60,7 +60,14 @@ class BuatPengaduan extends Component
             $this->isi = "[Kategori: " . $this->kategori_lainnya . "]\n" . $this->isi;
         }
         
-        $penanganan_khusus = ($kategori && $kategori->level_sensitivitas === 'tinggi') ? 1 : 0;
+        $namaKatLower = $kategori ? strtolower($kategori->nama_kategori) : '';
+        $isSensitif = $kategori && (
+            in_array($kategori->level_sensitivitas, ['sensitif', 'tinggi'])
+            || str_contains($namaKatLower, 'pelecehan')
+            || str_contains($namaKatLower, 'kekerasan')
+        );
+
+        $penanganan_khusus = $isSensitif ? 1 : 0;
         $mode_privasi = ($penanganan_khusus || $this->is_anonim) ? 'anonim' : 'umum';
 
         $ticketCode = 'PLP-' . date('Y') . '-' . strtoupper(substr(uniqid(), -4));
