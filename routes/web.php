@@ -188,62 +188,6 @@ Route::get('/update-rahasia-dpm', function () {
             </pre>";
 });
 
-// ============================================================
-// AUTO DEPLOY WEBHOOK 
-// ============================================================
-Route::get('/update-rahasia-mss', function () {
-    $gitPath = 'git';
-    if (file_exists('D:\laragon\bin\git\cmd\git.exe')) {
-        $gitPath = 'D:\laragon\bin\git\cmd\git.exe';
-    } elseif (file_exists('C:\laragon\bin\git\cmd\git.exe')) {
-        $gitPath = 'C:\laragon\bin\git\cmd\git.exe';
-    }
-    
-    putenv('GIT_TERMINAL_PROMPT=0');
-    putenv('GCM_INTERACTIVE=false');
-    
-    $repoDir = base_path(); // base_path for Laravel project
-    
-    // Perintah sakti untuk update, install, dan migrate
-    $output0 = shell_exec("cd \"$repoDir\" && \"$gitPath\" config --local credential.helper manager-core 2>&1");
-    $output1 = shell_exec("cd \"$repoDir\" && \"$gitPath\" fetch --all 2>&1");
-    $output2 = shell_exec("cd \"$repoDir\" && \"$gitPath\" reset --hard origin/main 2>&1");
-    $output3 = shell_exec("cd \"$repoDir\" && composer install 2>&1");
-    $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
-      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
-      $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
-    $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
-    $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
-    $output5 = shell_exec("cd \"$repoDir\" && npm install 2>&1");
-    $output6 = shell_exec("cd \"$repoDir\" && npm run build 2>&1");
-    
-    return "<h1 style='color:green;'>Berhasil Menarik Kodingan Baru & Update Sistem oleh MSS!</h1>
-            <h3>Laporan Log:</h3>
-            <pre style='background:#333;color:#0f0;padding:20px;border-radius:10px;'>
-[GIT CONFIG]
-" . htmlspecialchars((string) $output0) . "
-
-[GIT FETCH & PULL]
-" . htmlspecialchars((string) $output1) . "
-" . htmlspecialchars((string) $output2) . "
-
-[COMPOSER INSTALL]
-" . htmlspecialchars((string) $output3) . "
-
-[DATABASE MIGRATE]
-" . htmlspecialchars((string) $output4) . "
-
-
-  [CLEAR CACHE]
-  " . htmlspecialchars((string) $output_clear) . "
-
-  [NPM BUILD (TAMPILAN)]
-" . htmlspecialchars((string) $output5) . "
-" . htmlspecialchars((string) $output6) . "
-            </pre>";
-});
-
-
 Route::post('logout', function (\App\Livewire\Actions\Logout $logout) {
     $logout();
     return redirect('/');
@@ -306,6 +250,7 @@ Route::get('/cek-log-error', function () {
     return '<pre style="background:#1a1a1a;color:#ff6b6b;padding:20px;font-size:11px;white-space:pre-wrap;">' 
         . htmlspecialchars(implode('', $lines)) . '</pre>';
 });
+
 
 
 
