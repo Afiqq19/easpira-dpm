@@ -88,7 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // 2. STAFF DEWAN ROUTES
     Route::middleware('check.role:staff_dewan')->prefix('dewan')->name('dewan.')->group(function () {
-        Route::get('dashboard', \App\Livewire\Admin\Dashboard::class)->name('dashboard');
+        Route::get('dashboard', \App\Livewire\StaffDewan\Dashboard::class)->name('dashboard');
         
         // Manajemen Pengaduan
         Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');

@@ -22,7 +22,7 @@ class ExportPengaduanController extends Controller
             ->latest()
             ->get();
 
-        $filename = 'Data_Pengaduan_' . now()->format('Y-m-d_His') . '.csv';
+        $filename = 'Data_Pengaduan_e-Aspira_' . now()->format('d-m-Y') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -48,10 +48,10 @@ class ExportPengaduanController extends Controller
                 'Isi Pengaduan',
                 'Mode Privasi',
                 'Status',
-                'Penanganan Khusus',
-                'Tanggal Dibuat',
-                'Jam Dibuat',
-                'Tanggal Ditangani',
+                'Tanggal Masuk',
+                'Jam Masuk',
+                'Tanggal Selesai',
+                'Jam Selesai',
             ], ';');
 
             $no = 1;
@@ -65,19 +65,32 @@ class ExportPengaduanController extends Controller
                     $email = $pengaduan->user->email ?? '-';
                 }
 
+                // Tanggal selesai: ambil dari updated_at jika status = selesai
+                $tanggalSelesai = '-';
+                $jamSelesai = '-';
+                if ($pengaduan->status === 'selesai') {
+                    if ($pengaduan->ditangani_pada) {
+                        $tanggalSelesai = $pengaduan->ditangani_pada->format('d/m/Y');
+                        $jamSelesai = $pengaduan->ditangani_pada->format('H:i');
+                    } else {
+                        $tanggalSelesai = $pengaduan->updated_at->format('d/m/Y');
+                        $jamSelesai = $pengaduan->updated_at->format('H:i');
+                    }
+                }
+
                 fputcsv($handle, [
                     $no++,
                     $pengaduan->ticket_code,
                     $nama,
                     $email,
                     $pengaduan->kategori->nama_kategori ?? 'Umum',
-                    strip_tags($pengaduan->isi),
+                    str_replace(["\r\n", "\n", "\r"], ' ', strip_tags($pengaduan->isi)),
                     ucfirst($pengaduan->mode_privasi),
                     ucfirst($pengaduan->status),
-                    $pengaduan->penanganan_khusus ? 'Ya' : 'Tidak',
                     $pengaduan->created_at->format('d/m/Y'),
-                    $pengaduan->created_at->format('H:i:s'),
-                    $pengaduan->ditangani_pada ? $pengaduan->ditangani_pada->format('d/m/Y H:i') : '-',
+                    $pengaduan->created_at->format('H:i'),
+                    $tanggalSelesai,
+                    $jamSelesai,
                 ], ';');
             }
 
