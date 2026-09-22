@@ -139,71 +139,77 @@
 
 
 
-    @script
     <script>
-        // Data dari PHP/Livewire ke JS
-        const bulanList = @json($bulanList);
-        const masukChart = @json($pengaduanMasukChart);
-        const selesaiChart = @json($pengaduanSelesaiChart);
-        
-        // Chart Pengaduan (Line/Area Chart)
-        const optionsPengaduan = {
-            series: [{
-                name: 'Pengaduan Masuk',
-                data: masukChart // Tidak perlu di-reverse karena sudah urut dari PHP
-            }, {
-                name: 'Pengaduan Selesai',
-                data: selesaiChart
-            }],
-            chart: {
-                height: 320,
-                type: 'area',
-                fontFamily: 'Inter, sans-serif',
-                toolbar: { show: false },
-                zoom: { enabled: false }
-            },
-            colors: ['#e11d48', '#059669'], // Rose 600, Emerald 600
-            dataLabels: { enabled: false },
-            stroke: { curve: 'smooth', width: 3 },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.4,
-                    opacityTo: 0.05,
-                    stops: [0, 90, 100]
-                }
-            },
-            xaxis: {
-                categories: bulanList,
-                axisBorder: { show: false },
-                axisTicks: { show: false }
-            },
-            yaxis: {
-                labels: { formatter: (val) => { return Math.floor(val) } },
-                min: 0,
-                forceNiceScale: true
-            },
-            legend: { position: 'top', horizontalAlign: 'right' }
-        };
+        document.addEventListener('livewire:navigated', function() {
+            var el = document.querySelector("#chart-pengaduan");
+            if (!el || el.dataset.rendered) return;
 
-        const initChart = () => {
-            const el = document.querySelector("#chart-pengaduan");
-            if (!el) return;
-            el.innerHTML = ''; // bersihkan chart lama jika re-render
-            const chartPengaduan = new window.ApexCharts(el, optionsPengaduan);
-            chartPengaduan.render();
-        };
+            var bulanList = @json($bulanList);
+            var masukChart = @json($pengaduanMasukChart);
+            var selesaiChart = @json($pengaduanSelesaiChart);
 
-        if (typeof window.ApexCharts !== 'undefined') {
-            initChart();
-        } else {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
-            script.onload = initChart;
-            document.head.appendChild(script);
-        }
+            var optionsPengaduan = {
+                series: [{
+                    name: 'Pengaduan Masuk',
+                    data: masukChart
+                }, {
+                    name: 'Pengaduan Selesai',
+                    data: selesaiChart
+                }],
+                chart: {
+                    height: 320,
+                    type: 'area',
+                    fontFamily: 'Inter, sans-serif',
+                    toolbar: { show: false },
+                    zoom: { enabled: false }
+                },
+                colors: ['#e11d48', '#059669'],
+                dataLabels: { enabled: false },
+                stroke: { curve: 'smooth', width: 3 },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.4,
+                        opacityTo: 0.05,
+                        stops: [0, 90, 100]
+                    }
+                },
+                xaxis: {
+                    categories: bulanList,
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: { formatter: function(val) { return Math.floor(val) } },
+                    min: 0,
+                    forceNiceScale: true
+                },
+                legend: { position: 'top', horizontalAlign: 'right' }
+            };
 
+            function renderChart() {
+                if (typeof window.ApexCharts === 'undefined') return;
+                el.innerHTML = '';
+                var chart = new window.ApexCharts(el, optionsPengaduan);
+                chart.render();
+                el.dataset.rendered = 'true';
+            }
+
+            if (typeof window.ApexCharts !== 'undefined') {
+                renderChart();
+            } else {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
+                s.onload = renderChart;
+                document.head.appendChild(s);
+            }
+        });
+
+        // Also run on initial page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var event = new Event('livewire:navigated');
+            document.dispatchEvent(event);
+        });
     </script>
-    @endscript
 </div>
