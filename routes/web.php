@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('log-aktivitas', \App\Livewire\Admin\LogAktivitas::class)->name('log-aktivitas');
         // Manajemen Pengaduan
         Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
+        Route::get('pengaduan/export-excel', [\App\Http\Controllers\ExportPengaduanController::class, 'export'])->name('pengaduan.export');
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
         // Pantau Evaluasi Proker
         Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
@@ -81,6 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
         // Pantau Pengaduan Mahasiswa (Read Only)
         Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
+        Route::get('pengaduan/export-excel', [\App\Http\Controllers\ExportPengaduanController::class, 'export'])->name('pengaduan.export');
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
     });
 
@@ -90,6 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         // Manajemen Pengaduan
         Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
+        Route::get('pengaduan/export-excel', [\App\Http\Controllers\ExportPengaduanController::class, 'export'])->name('pengaduan.export');
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
         
         // Manajemen Pengumuman DPM

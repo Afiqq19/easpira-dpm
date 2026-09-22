@@ -31,6 +31,13 @@
         </div>
     @endif
 
+    @if (session()->has('message_error'))
+        <div class="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center border border-rose-100 animate-fade-in">
+            <svg class="w-5 h-5 mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            <span class="font-medium text-sm">{{ session('message_error') }}</span>
+        </div>
+    @endif
+
     <!-- Filters -->
     <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
@@ -59,9 +66,9 @@
                 $org = $proker->organisasi;
                 $warna = $org ? $org->warna : ['bg'=>'bg-violet-700','light'=>'bg-violet-100','text'=>'text-violet-700','badge'=>'bg-violet-700 text-white','border'=>'border-violet-300','hex'=>'#6d28d9'];
             @endphp
-            <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group relative">
+            <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group relative {{ in_array($proker->id, $evaluatedProkerIds) ? 'ring-2 ring-emerald-200' : '' }}">
                 <!-- Color Strip Top -->
-                <div class="absolute top-0 left-0 right-0 h-1.5 {{ $warna['bg'] }}"></div>
+                <div class="absolute top-0 left-0 right-0 h-1.5 {{ in_array($proker->id, $evaluatedProkerIds) ? 'bg-emerald-500' : $warna['bg'] }}"></div>
                 
                 <div class="p-6 flex flex-col flex-1 mt-1">
                     <!-- Org Badge -->
@@ -74,7 +81,12 @@
                             @endif
                         </span>
                         
-                        @if($proker->status === 'berjalan')
+                        @if(in_array($proker->id, $evaluatedProkerIds))
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                Sudah Dievaluasi
+                            </span>
+                        @elseif($proker->status === 'berjalan')
                             <span class="flex h-3 w-3 relative" title="Sedang Berjalan">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
@@ -90,10 +102,16 @@
                         <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                             {{ ucfirst($proker->kategori) }}
                         </div>
-                        <button wire:click="bukaModalEvaluasi({{ $proker->id }})" class="inline-flex items-center text-sm font-bold {{ $warna['text'] }} hover:opacity-70 transition-opacity">
-                            Beri Evaluasi
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
+                        @if(in_array($proker->id, $evaluatedProkerIds))
+                            <span class="inline-flex items-center text-sm font-bold text-slate-400 cursor-not-allowed">
+                                Sudah Dinilai ✓
+                            </span>
+                        @else
+                            <button wire:click="bukaModalEvaluasi({{ $proker->id }})" class="inline-flex items-center text-sm font-bold {{ $warna['text'] }} hover:opacity-70 transition-opacity">
+                                Beri Evaluasi
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>

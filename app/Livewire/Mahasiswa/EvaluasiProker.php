@@ -78,7 +78,10 @@ class EvaluasiProker extends Component
         
         $organisasis = $orgQuery->get();
 
-        return view('livewire.mahasiswa.evaluasi-proker', compact('prokers', 'organisasis', 'user'));
+        // Ambil daftar proker_id yang sudah dievaluasi user ini
+        $evaluatedProkerIds = EvaluasiModel::where('user_id', $user->id)->pluck('program_kerja_id')->toArray();
+
+        return view('livewire.mahasiswa.evaluasi-proker', compact('prokers', 'organisasis', 'user', 'evaluatedProkerIds'));
     }
 
     public function bukaModalEvaluasi($id)
@@ -92,25 +95,16 @@ class EvaluasiProker extends Component
             ->first();
             
         if ($existingEvaluasi) {
-            $this->rating = $existingEvaluasi->rating;
-            $this->aspek = $existingEvaluasi->aspek;
-            $this->is_anonim = $existingEvaluasi->is_anonim;
-            
-            // Cek apakah komentar memiliki prefix [Aspek: ...]
-            if ($this->aspek === 'lainnya' && preg_match('/^\[Aspek: (.*?)\]\n(.*)/s', $existingEvaluasi->komentar, $matches)) {
-                $this->aspek_lainnya = $matches[1];
-                $this->komentar = trim($matches[2]);
-            } else {
-                $this->komentar = $existingEvaluasi->komentar;
-                $this->aspek_lainnya = '';
-            }
-        } else {
-            $this->rating = 5;
-            $this->komentar = '';
-            $this->aspek = 'pelaksanaan';
-            $this->aspek_lainnya = '';
-            $this->is_anonim = false;
+            // Mahasiswa sudah pernah evaluasi proker ini, tolak
+            session()->flash('message_error', 'Anda sudah pernah memberikan evaluasi untuk program kerja "' . $this->selectedProker->nama . '". Setiap mahasiswa hanya dapat memberikan 1 evaluasi per program kerja.');
+            return;
         }
+
+        $this->rating = 5;
+        $this->komentar = '';
+        $this->aspek = 'pelaksanaan';
+        $this->aspek_lainnya = '';
+        $this->is_anonim = false;
         
         $this->isModalOpen = true;
     }
@@ -133,25 +127,31 @@ class EvaluasiProker extends Component
         ]);
 
         $user = auth()->user();
+
+        // Guard: cek ulang duplikasi sebelum simpan
+        $sudahAda = EvaluasiModel::where('program_kerja_id', $this->proker_id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($sudahAda) {
+            $this->isModalOpen = false;
+            session()->flash('message_error', 'Anda sudah pernah memberikan evaluasi untuk program kerja ini.');
+            return;
+        }
         
         $finalKomentar = $this->komentar;
         if ($this->aspek === 'lainnya' && !empty($this->aspek_lainnya)) {
             $finalKomentar = "[Aspek: " . $this->aspek_lainnya . "]\n" . $this->komentar;
         }
         
-        EvaluasiModel::updateOrCreate(
-            [
-                'program_kerja_id' => $this->proker_id,
-                'user_id' => $user->id,
-            ],
-            [
-                'rating' => $this->rating,
-                'komentar' => $finalKomentar,
-                'aspek' => $this->aspek,
-                // HMPS/UKM/Staff Dewan boleh anonim, tapi Admin selalu LIHAT nama asli (dihandle di view)
+        EvaluasiModel::create([
+            'program_kerja_id' => $this->proker_id,
+            'user_id' => $user->id,
+            'rating' => $this->rating,
+            'komentar' => $finalKomentar,
+            'aspek' => $this->aspek,
             'is_anonim' => $this->is_anonim,
-            ]
-        );
+        ]);
 
         $this->isModalOpen = false;
         session()->flash('message', 'Evaluasi Anda berhasil dikirim. Terima kasih atas partisipasinya!');
