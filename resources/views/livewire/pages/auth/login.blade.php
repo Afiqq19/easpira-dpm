@@ -27,6 +27,8 @@ new #[Layout('layouts.guest')] class extends Component
             $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
         } elseif ($user->hasRole('staff_dewan')) {
             $this->redirectIntended(default: route('dewan.dashboard', absolute: false), navigate: true);
+        } elseif ($user->hasRole('direktur') || $user->hasRole('wakil_direktur')) {
+            $this->redirectIntended(default: route('eksekutif.dashboard', absolute: false), navigate: true);
         } elseif ($user->hasRole('hmps') || $user->hasRole('ukm')) {
             $this->redirectIntended(default: route('organisasi.dashboard', absolute: false), navigate: true);
         } else {

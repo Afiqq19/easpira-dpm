@@ -79,6 +79,8 @@ class GoogleController extends Controller
                 return redirect()->route('admin.dashboard');
             } elseif ($user->hasRole('staff_dewan')) {
                 return redirect()->route('dewan.dashboard');
+            } elseif ($user->hasRole('direktur') || $user->hasRole('wakil_direktur')) {
+                return redirect()->route('eksekutif.dashboard');
             } elseif ($user->hasRole('hmps') || $user->hasRole('ukm')) {
                 return redirect()->route('organisasi.dashboard');
             }
