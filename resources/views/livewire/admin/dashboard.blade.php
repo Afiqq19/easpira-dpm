@@ -112,7 +112,7 @@
                         <div class="w-2 h-4 bg-indigo-500 rounded-full"></div>
                         <h3 class="text-base font-bold text-slate-800">Proker Mendatang</h3>
                     </div>
-                    <a href="{{ route('admin.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
+                    <a href="{{ route('admin.proker-kegiatan.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
                 </div>
                 <div class="space-y-3">
                     @forelse($upcomingProkers as $proker)
