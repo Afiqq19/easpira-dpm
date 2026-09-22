@@ -154,28 +154,13 @@ Route::get('/cek-env-google', function () {
     $envContent = preg_replace('/(DB_PASSWORD=).*/', '$1********', $envContent);
     $envContent = preg_replace('/(GOOGLE_CLIENT_SECRET=).*/', '$1********', $envContent);
 
-    $extensions = get_loaded_extensions();
-    $hasGd = extension_loaded('gd') ? 'YES' : 'NO';
-    $hasZip = extension_loaded('zip') ? 'YES' : 'NO';
-    $hasPdoMysql = extension_loaded('pdo_mysql') ? 'YES' : 'NO';
-    $vendorPath = base_path('vendor');
-    $phpofficePath = base_path('vendor/phpoffice');
-    $hasPhpOfficeDir = is_dir($phpofficePath) ? 'YES' : 'NO';
-    $classSpreadsheet = class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class) ? 'YES' : 'NO';
-
-    $testExporter = 'FAIL';
-    try {
-        $testData = \App\Services\SimpleXlsxExporter::create('Test', ['NO', 'NAMA'], [[1, 'Budi']], [10, 20], 'TEST TITLE');
-        $testExporter = 'SUCCESS (' . strlen($testData) . ' bytes generated)';
-    } catch (\Throwable $e) {
-        $testExporter = 'ERROR: ' . $e->getMessage();
-    }
-
-    return "<h2 style='color:green;'>DIAGNOSTIK SERVER DOCKER</h2>
-            <b>PHP Version:</b> " . phpversion() . "<br>
-            <b>Extension GD:</b> " . $hasGd . "<br>
-            <b>Extension ZIP:</b> " . $hasZip . "<br>
-            <b>SimpleXlsxExporter Test:</b> <span style='color:blue; font-weight:bold;'>" . $testExporter . "</span><br>";
+    return "<h2 style='color:red;'>HASIL CEK DI DALAM SERVER DOCKER</h2>
+            <b>1. Nilai dari Config Laravel (yang dipakai web saat ini):</b><br>
+            Client ID: " . config('services.google.client_id') . "<br>
+            Redirect: " . config('services.google.redirect') . "<br><br>
+            
+            <b>2. Isi File .env Asli di Dalam Docker (" . $envPath . "):</b><br>
+            <textarea style='width:100%; height:400px; background:#222; color:#0f0; padding:10px; font-family:monospace;'>" . htmlspecialchars($envContent) . "</textarea>";
 });
 
 // ============================================================
