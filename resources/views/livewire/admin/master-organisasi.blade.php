@@ -35,6 +35,7 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Nama / Singkatan</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tipe</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Periode Aktif</th>
                         <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -53,20 +54,25 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="flex flex-col gap-1.5">
-                                    @if($org->is_active)
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 self-start">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 self-start">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif
-                                        </span>
-                                    @endif
-                                    @if($org->activePeriode)
-                                        <span class="text-[10px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md self-start">Periode: {{ $org->activePeriode->nama }}</span>
-                                    @endif
-                                </div>
+                                @if($org->activePeriode)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        {{ $org->activePeriode->nama }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-slate-400 italic">Belum diatur</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($org->is_active)
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-100 self-start">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aktif
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200 self-start">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
