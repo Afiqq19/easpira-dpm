@@ -61,8 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
         // Pantau Evaluasi Proker
         Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
-        // Kelola Proker
-        Route::get('proker', \App\Livewire\Organisasi\KelolaProker::class)->name('proker.index');
+        // Kelola Proker (Read Only)
+        Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
         // Kelola Kegiatan
         Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');
         // Kelola UU Kema
@@ -96,8 +96,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Pantau Evaluasi Proker
         Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
         
-        // Kelola Proker
-        Route::get('proker', \App\Livewire\Organisasi\KelolaProker::class)->name('proker.index');
+        // Kelola Proker (Read-Only)
+        Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
         
         // Kelola Kegiatan
         Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');

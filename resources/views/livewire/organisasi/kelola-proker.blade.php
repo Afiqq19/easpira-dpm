@@ -2,38 +2,13 @@
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-3">
-                @if(auth()->user()->hasRole(['admin', 'staff_dewan']) && $selectedOrganisasi)
-                    <button wire:click="kembaliKeOrganisasi" class="p-2 rounded-xl bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition-all shadow-sm border border-slate-200">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-                @endif
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
-                        @if(auth()->user()->hasRole(['admin', 'staff_dewan']) && $selectedOrganisasi)
-                            Proker {{ $selectedOrganisasiNama }}
-                        @elseif(auth()->user()->hasRole(['admin', 'staff_dewan']) && !$selectedOrganisasi)
-                            Proker Organisasi
-                        @else
-                            Kelola Program Kerja
-                        @endif
-                    </h2>
-                    <p class="text-sm text-slate-500 mt-1">
-                        @if(auth()->user()->hasRole(['admin', 'staff_dewan']) && !$selectedOrganisasi)
-                            Pilih organisasi untuk mengelola daftar program kerjanya.
-                        @else
-                            Daftarkan dan pantau status program kerja organisasi Anda agar dapat dievaluasi oleh mahasiswa.
-                        @endif
-                    </p>
-                </div>
-            </div>
+            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Kelola Program Kerja</h2>
+            <p class="text-sm text-slate-500 mt-1">Daftarkan dan pantau status program kerja organisasi Anda agar dapat dievaluasi oleh mahasiswa.</p>
         </div>
-        @if($selectedOrganisasi)
         <button wire:click="create" class="inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold shadow-md shadow-indigo-500/30 hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
             <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Proker Baru
         </button>
-        @endif
     </div>
 
     <!-- Flash Message -->
@@ -44,50 +19,8 @@
         </div>
     @endif
 
-    @if(!$selectedOrganisasi)
-        <!-- Search Organisasi -->
-        <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </div>
-                <input wire:model.live.debounce.300ms="searchOrg" type="text" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors" placeholder="Cari organisasi (nama / singkatan)...">
-            </div>
-        </div>
-
-        <!-- Grid Organisasi -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            @forelse($organisasis as $org)
-                <button wire:click="pilihOrganisasi({{ $org->id }})" class="text-left bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-indigo-300 hover:shadow-md hover:bg-indigo-50/30 transition-all duration-200 group">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shrink-0 shadow-inner
-                            {{ $org->tipe === 'HMPS' ? 'bg-indigo-100 text-indigo-600' : ($org->tipe === 'UKM' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600') }}">
-                            {{ strtoupper(substr($org->singkatan ?? $org->nama, 0, 2)) }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors">{{ $org->singkatan ?? $org->nama }}</h3>
-                            <p class="text-xs text-slate-500 truncate">{{ $org->nama }}</p>
-                            <div class="flex items-center gap-2 mt-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full
-                                    {{ $org->tipe === 'HMPS' ? 'bg-indigo-50 text-indigo-600' : ($org->tipe === 'UKM' ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600') }}">
-                                    {{ $org->tipe }}
-                                </span>
-                                <span class="text-[10px] font-bold text-slate-400">{{ $org->program_kerja_count }} Proker</span>
-                            </div>
-                        </div>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                    </div>
-                </button>
-            @empty
-                <div class="col-span-full text-center py-12 text-slate-400">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    <p class="font-medium">Belum ada organisasi terdaftar.</p>
-                </div>
-            @endforelse
-        </div>
-    @else
-        <!-- Filter & Search Section -->
-        <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4">
+    <!-- Filter & Search Section -->
+    <div class="bg-white/60 backdrop-blur-md p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4">
         <div class="flex-1 relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -115,9 +48,7 @@
                                 <div class="font-medium text-slate-900">{{ $proker->nama }}</div>
                                 <div class="text-xs text-slate-500 font-semibold mt-1 flex items-center gap-2">
                                     <span class="uppercase tracking-wider">{{ $proker->kategori === 'lainnya' && $proker->kategori_lainnya ? $proker->kategori_lainnya : $proker->kategori }}</span>
-                                    @if(auth()->user()->hasRole(['admin', 'staff_dewan']))
-                                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-indigo-700 text-[10px]">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? 'Tidak Diketahui' }}</span>
-                                    @endif
+                                    <!-- Organisasi name not needed since it's filtered per user -->
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
@@ -170,13 +101,12 @@
                 </tbody>
             </table>
         </div>
-        @if($prokers && $prokers->hasPages())
+        @if($prokers->hasPages())
             <div class="px-6 py-4 border-t border-slate-200">
                 {{ $prokers->links() }}
             </div>
         @endif
     </div>
-    @endif
 
     <!-- Form Modal -->
     @if($isModalOpen)
@@ -207,7 +137,7 @@
                                 @error('nama') <span class="text-rose-500 text-xs mt-1 block font-medium">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Organisasi ID is automatically set in component -->
+                            <!-- Organisasi ID otomatis sesuai user -->
 
                             <div>
                                 <label for="kategori" class="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>

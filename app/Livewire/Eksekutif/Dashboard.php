@@ -58,11 +58,18 @@ class Dashboard extends Component
             ->take(5)
             ->get();
 
+        // 5. UPCOMING PROKERS: Proker yang mau jalan / sedang berjalan
+        $upcomingProkers = ProgramKerja::with('organisasi')
+            ->orderByRaw("FIELD(status, 'berjalan', 'rencana', 'selesai', 'dibatalkan')")
+            ->orderBy('tanggal_mulai', 'asc')
+            ->take(5)
+            ->get();
+
         return view('livewire.eksekutif.dashboard', compact(
             'totalPengaduan', 'pengaduanSelesai', 'pengaduanBaru',
             'totalProker', 'prokerBerjalan', 'totalOrganisasi',
             'bulanList', 'pengaduanMasukChart', 'pengaduanSelesaiChart',
-            'prokerStatusChart', 'leaderboard'
+            'prokerStatusChart', 'leaderboard', 'upcomingProkers'
         ));
     }
 }
