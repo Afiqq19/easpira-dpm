@@ -38,6 +38,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Profil (Bisa diakses semua role)
     Route::view('profile', 'profile.index')->name('profile');
+    Route::get('/dashboard', function () {
+        return redirect()->route('dashboard.redirect');
+    })->name('dashboard');
     Route::get('/dashboard-redirect', function () {
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user->hasRole('admin')) return redirect()->route('admin.dashboard');

@@ -56,6 +56,50 @@
                             <span class="font-heading font-bold text-slate-800 text-sm">e-Aspira <span class="text-indigo-600">DPM</span></span>
                         </div>
 
+                        <!-- Desktop Page Title & Breadcrumb (Navbar Atas) -->
+                        <div class="hidden md:flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100/80 flex items-center justify-center text-indigo-600 shadow-2xs">
+                                @if(request()->routeIs('*dashboard*'))
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                                @elseif(request()->routeIs('*proker*'))
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                @elseif(request()->routeIs('*pengaduan*'))
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                @elseif(request()->routeIs('*users*'))
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                @else
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                                <span class="text-slate-400">e-Aspira</span>
+                                <span>/</span>
+                                <span class="font-bold text-slate-800 text-sm tracking-tight">
+                                    @if(request()->routeIs('*dashboard*'))
+                                        Dashboard
+                                    @elseif(request()->routeIs('*proker*'))
+                                        Pantau Proker
+                                    @elseif(request()->routeIs('*pengaduan*'))
+                                        Pantau Pengaduan
+                                    @elseif(request()->routeIs('*users*'))
+                                        Manajemen User
+                                    @elseif(request()->routeIs('*pengumuman*'))
+                                        Pengumuman
+                                    @elseif(request()->routeIs('*evaluasi*'))
+                                        Evaluasi Proker
+                                    @elseif(request()->routeIs('*uu-kema*'))
+                                        UU Kema
+                                    @elseif(request()->routeIs('*log*'))
+                                        Log Aktivitas
+                                    @elseif(request()->routeIs('*profile*'))
+                                        Profil Saya
+                                    @else
+                                        {{ isset($header) ? $header : 'Dashboard' }}
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+
                     </div>
                     
                     <div class="flex items-center gap-2 sm:gap-4">
