@@ -70,70 +70,69 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Line Chart -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 lg:col-span-2">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Tren Pengaduan (6 Bulan Terakhir)</h3>
-            <div id="chart-pengaduan" wire:ignore class="w-full h-80"></div>
-        </div>
-        
-        <!-- Pie Chart & Leaderboard -->
-        <div class="space-y-6 lg:col-span-1">
-            <!-- Proker Mendatang & Berjalan (Menggantikan Chart) -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
-                    <a href="{{ route(auth()->user()->hasRole('admin') ? 'admin.proker.index' : 'dewan.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
-                </div>
-                <div class="space-y-4">
-                    @forelse($upcomingProkers as $proker)
-                    <div class="flex flex-col gap-1 border-b border-slate-50 pb-3 last:border-0 last:pb-0">
-                        <div class="flex items-center justify-between">
-                            <p class="font-bold text-slate-800 text-sm truncate pr-2">{{ $proker->nama }}</p>
-                            <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
-                                {{ $proker->status === 'rencana' ? 'bg-slate-100 text-slate-700' : '' }}
-                                {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700 animate-pulse' : '' }}
-                                {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
-                                {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
-                                {{ $proker->status }}
-                            </span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs text-slate-500">
+    <!-- Tren Pengaduan Chart (Full Width) -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+        <h3 class="text-lg font-bold text-slate-800 mb-4">Tren Pengaduan (6 Bulan Terakhir)</h3>
+        <div id="chart-pengaduan" wire:ignore class="w-full h-72"></div>
+    </div>
+
+    <!-- Proker Mendatang & Organisasi Teraktif (Side by Side) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Proker Mendatang -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
+                <a href="{{ route('admin.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
+            </div>
+            <div class="space-y-3">
+                @forelse($upcomingProkers as $proker)
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/50 transition-colors">
+                    <div class="flex-1 min-w-0 mr-3">
+                        <p class="font-bold text-slate-800 text-sm truncate">{{ $proker->nama }}</p>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
                             <span class="font-semibold text-indigo-600">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? '-' }}</span>
-                            <span>{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M') : '-' }}</span>
+                            <span>&bull;</span>
+                            <span>{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M Y') : '-' }}</span>
                         </div>
                     </div>
-                    @empty
-                    <p class="text-sm text-slate-500 text-center py-4">Belum ada program kerja.</p>
-                    @endforelse
+                    <span class="inline-flex flex-shrink-0 items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                        {{ $proker->status === 'rencana' ? 'bg-slate-200 text-slate-700' : '' }}
+                        {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700' : '' }}
+                        {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
+                        {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
+                        {{ $proker->status }}
+                    </span>
                 </div>
+                @empty
+                <p class="text-sm text-slate-500 text-center py-6">Belum ada program kerja.</p>
+                @endforelse
             </div>
+        </div>
 
-            <!-- Leaderboard -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Organisasi Teraktif</h3>
-                <ul class="space-y-4">
-                    @forelse($leaderboard as $idx => $org)
-                    <li class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-slate-100 font-bold text-sm text-slate-500 flex items-center justify-center">
-                                {{ $idx + 1 }}
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-slate-800">{{ $org->singkatan ?? $org->nama }}</p>
-                                <p class="text-xs text-slate-500">{{ $org->tipe }}</p>
-                            </div>
+        <!-- Organisasi Teraktif -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Organisasi Teraktif</h3>
+            <ul class="space-y-3">
+                @forelse($leaderboard as $idx => $org)
+                <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full font-bold text-sm flex items-center justify-center
+                            {{ $idx === 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500' }}">
+                            {{ $idx + 1 }}
                         </div>
-                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold bg-indigo-50 text-indigo-700 rounded-lg">
-                            {{ $org->program_kerja_count }} Proker
-                        </span>
-                    </li>
-                    @empty
-                    <li class="text-sm text-slate-500 text-center py-4">Belum ada data organisasi.</li>
-                    @endforelse
-                </ul>
-            </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">{{ $org->singkatan ?? $org->nama }}</p>
+                            <p class="text-xs text-slate-500">{{ $org->tipe }}</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold bg-indigo-50 text-indigo-700 rounded-lg">
+                        {{ $org->program_kerja_count }} Proker
+                    </span>
+                </li>
+                @empty
+                <li class="text-sm text-slate-500 text-center py-6">Belum ada data organisasi.</li>
+                @endforelse
+            </ul>
         </div>
     </div>
 
