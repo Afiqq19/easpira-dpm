@@ -40,7 +40,7 @@ new class extends Component
         $user->name = $this->nama;
         
         // Simpan NIM & Prodi jika role mahasiswa
-        if ($user->hasRole('mahasiswa') || !$user->hasAnyRole(['admin', 'staff_dewan'])) {
+        if ($user->hasRole('mahasiswa')) {
             $user->nim = $this->nim;
             $user->prodi = $this->prodi;
         }
@@ -56,7 +56,8 @@ new class extends Component
 <div class="space-y-6">
     @php
         $user = Auth::user();
-        $isStaffOrAdmin = $user->hasAnyRole(['admin', 'staff_dewan']);
+        $isMahasiswa = $user->hasRole('mahasiswa');
+        $isOrganisasi = $user->hasAnyRole(['hmps', 'ukm']);
     @endphp
 
     <div class="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -115,7 +116,7 @@ new class extends Component
             </div>
 
             <!-- NIM & Prodi (Hanya Ditampilkan untuk Mahasiswa) -->
-            @if(!$isStaffOrAdmin)
+            @if($isMahasiswa)
                 <!-- NIM -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -138,6 +139,19 @@ new class extends Component
                         <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
                     @error('prodi') <p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p> @enderror
+                </div>
+            @endif
+
+            <!-- Organisasi -->
+            @if($isOrganisasi && $user->organisasi)
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        Organisasi
+                    </label>
+                    <div class="relative">
+                        <input type="text" disabled value="{{ $user->organisasi->nama }}" class="w-full rounded-2xl border-slate-200 bg-slate-100 text-sm px-4 py-2.5 pl-10 text-slate-500 font-medium cursor-not-allowed">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
                 </div>
             @endif
         </div>
