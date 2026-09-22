@@ -194,6 +194,28 @@ Route::get('/update-rahasia-dpm', function () {
       $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
       $output_dbseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=DatabaseSeeder --force 2>&1");
+      
+      // Auto backfill tiket anonim ke pemiliknya
+      $backfillLogs = [];
+      try {
+          $unlinked = \App\Models\Pengaduan::whereNull('user_id')->get();
+          $enc = app(\App\Services\EnkripsiIdentitasService::class);
+          foreach ($unlinked as $u) {
+              $data = $enc->bukaIdentitas($u);
+              if ($data && !empty($data['user_id'])) {
+                  $u->user_id = $data['user_id'];
+                  if (empty($u->kode_anonim)) {
+                      $u->kode_anonim = \App\Models\Pengaduan::generateKodeAnonim();
+                  }
+                  $u->saveQuietly();
+                  $backfillLogs[] = "Tiket {$u->ticket_code} sukses di-link ke User ID: {$u->user_id} ({$data['nama']})";
+              }
+          }
+      } catch (\Throwable $e) {
+          $backfillLogs[] = "Backfill exception: " . $e->getMessage();
+      }
+      $output_backfill = implode("\n", $backfillLogs) ?: "Semua tiket sudah terhubung ke user_id.";
+
     $output_optimize = shell_exec("cd \"$repoDir\" && php artisan optimize 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
     
@@ -216,6 +238,9 @@ Route::get('/update-rahasia-dpm', function () {
 " . htmlspecialchars((string) $output_roles) . "
 " . htmlspecialchars((string) $output_katseed) . "
 " . htmlspecialchars((string) $output_dbseed) . "
+
+[BACKFILL TIKET ANONIM]
+" . htmlspecialchars((string) $output_backfill) . "
 
 [OPTIMIZE & CACHE]
 " . htmlspecialchars((string) $output_optimize) . "

@@ -55,6 +55,24 @@ class DaftarPengaduan extends Component
 
     public function render()
     {
+        // Auto-link tiket anonim lama yang user_id nya masih null
+        try {
+            $unlinked = Pengaduan::whereNull('user_id')->where('mode_privasi', 'anonim')->get();
+            if ($unlinked->isNotEmpty()) {
+                $enkripsiService = app(\App\Services\EnkripsiIdentitasService::class);
+                foreach ($unlinked as $un) {
+                    $data = $enkripsiService->bukaIdentitas($un);
+                    if ($data && !empty($data['user_id'])) {
+                        $un->user_id = $data['user_id'];
+                        if (empty($un->kode_anonim)) {
+                            $un->kode_anonim = Pengaduan::generateKodeAnonim();
+                        }
+                        $un->saveQuietly();
+                    }
+                }
+            }
+        } catch (\Throwable $e) {}
+
         return view('livewire.mahasiswa.daftar-pengaduan', [
             'pengaduanUmum' => Pengaduan::where('user_id', Auth::id())->latest()->paginate(10),
         ]);
