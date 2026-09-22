@@ -150,10 +150,10 @@
         const optionsPengaduan = {
             series: [{
                 name: 'Pengaduan Masuk',
-                data: masukChart.reverse()
+                data: masukChart // Tidak perlu di-reverse karena sudah urut dari PHP
             }, {
                 name: 'Pengaduan Selesai',
-                data: selesaiChart.reverse()
+                data: selesaiChart
             }],
             chart: {
                 height: 320,
@@ -175,18 +175,34 @@
                 }
             },
             xaxis: {
-                categories: bulanList.reverse(),
+                categories: bulanList,
                 axisBorder: { show: false },
                 axisTicks: { show: false }
             },
             yaxis: {
-                labels: { formatter: (val) => { return Math.floor(val) } }
+                labels: { formatter: (val) => { return Math.floor(val) } },
+                min: 0,
+                forceNiceScale: true
             },
             legend: { position: 'top', horizontalAlign: 'right' }
         };
 
-        const chartPengaduan = new window.ApexCharts(document.querySelector("#chart-pengaduan"), optionsPengaduan);
-        chartPengaduan.render();
+        const initChart = () => {
+            const el = document.querySelector("#chart-pengaduan");
+            if (!el) return;
+            el.innerHTML = ''; // bersihkan chart lama jika re-render
+            const chartPengaduan = new window.ApexCharts(el, optionsPengaduan);
+            chartPengaduan.render();
+        };
+
+        if (typeof window.ApexCharts !== 'undefined') {
+            initChart();
+        } else {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
+            script.onload = initChart;
+            document.head.appendChild(script);
+        }
 
     </script>
     @endscript
