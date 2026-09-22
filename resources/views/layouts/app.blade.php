@@ -106,7 +106,8 @@
             </div>
         </div>
 
-        <!-- HEIC converter & SweetAlert2 -->
+        <!-- External Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
