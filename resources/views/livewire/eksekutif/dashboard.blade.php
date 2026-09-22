@@ -179,6 +179,11 @@
             var masukChart = @json($pengaduanMasukChart);
             var selesaiChart = @json($pengaduanSelesaiChart);
 
+            // Use clean 3-letter month labels for x-axis (Apr, Mei, Jun, Jul, Agt, Sep)
+            var bulanShort = bulanList.map(function(item) {
+                return item ? item.split(' ')[0] : item;
+            });
+
             var optionsPengaduan = {
                 series: [{
                     name: 'Pengaduan Masuk',
@@ -189,7 +194,7 @@
                 }],
                 chart: {
                     type: 'area',
-                    height: 290,
+                    height: 260,
                     width: '100%',
                     fontFamily: 'Inter, sans-serif',
                     toolbar: { show: false },
@@ -205,16 +210,16 @@
                 dataLabels: { enabled: false },
                 stroke: {
                     curve: 'smooth',
-                    width: [3, 3],
+                    width: [3.5, 3.5],
                     lineCap: 'round'
                 },
                 markers: {
-                    size: 4,
+                    size: 5,
                     colors: ['#ffffff', '#ffffff'],
                     strokeColors: ['#6366f1', '#10b981'],
-                    strokeWidth: 2.5,
+                    strokeWidth: 3,
                     hover: {
-                        size: 7,
+                        size: 8,
                         sizeOffset: 3
                     }
                 },
@@ -234,22 +239,29 @@
                     xaxis: { lines: { show: false } },
                     yaxis: { lines: { show: true } },
                     padding: {
-                        top: -10,
-                        right: 20,
+                        top: 5,
+                        right: 35,
                         bottom: 0,
-                        left: 10
+                        left: 15
                     }
                 },
                 xaxis: {
-                    categories: bulanList,
+                    type: 'category',
+                    categories: bulanShort,
+                    tickAmount: 5,
+                    tickPlacement: 'on',
+                    hideOverlappingLabels: false,
                     axisBorder: { show: false },
                     axisTicks: { show: false },
                     labels: {
+                        rotate: 0,
+                        hideOverlappingLabels: false,
+                        trim: false,
                         style: {
                             colors: '#94a3b8',
-                            fontSize: '11px',
+                            fontSize: '12px',
                             fontFamily: 'Inter, sans-serif',
-                            fontWeight: 500
+                            fontWeight: 600
                         }
                     },
                     tooltip: { enabled: false }
@@ -277,6 +289,12 @@
                     style: {
                         fontSize: '12px',
                         fontFamily: 'Inter, sans-serif'
+                    },
+                    x: {
+                        formatter: function(val, opts) {
+                            var idx = opts ? opts.dataPointIndex : -1;
+                            return (idx >= 0 && bulanList[idx]) ? bulanList[idx] : val;
+                        }
                     },
                     y: {
                         formatter: function(val) {
