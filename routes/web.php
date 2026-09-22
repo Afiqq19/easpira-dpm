@@ -163,17 +163,19 @@ Route::get('/cek-env-google', function () {
     $hasPhpOfficeDir = is_dir($phpofficePath) ? 'YES' : 'NO';
     $classSpreadsheet = class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class) ? 'YES' : 'NO';
 
+    $testExporter = 'FAIL';
+    try {
+        $testData = \App\Services\SimpleXlsxExporter::create('Test', ['NO', 'NAMA'], [[1, 'Budi']], [10, 20], 'TEST TITLE');
+        $testExporter = 'SUCCESS (' . strlen($testData) . ' bytes generated)';
+    } catch (\Throwable $e) {
+        $testExporter = 'ERROR: ' . $e->getMessage();
+    }
+
     return "<h2 style='color:green;'>DIAGNOSTIK SERVER DOCKER</h2>
             <b>PHP Version:</b> " . phpversion() . "<br>
             <b>Extension GD:</b> " . $hasGd . "<br>
             <b>Extension ZIP:</b> " . $hasZip . "<br>
-            <b>Extension PDO MySQL:</b> " . $hasPdoMysql . "<br>
-            <b>Vendor Path:</b> " . $vendorPath . " (" . (is_dir($vendorPath) ? 'EXISTS' : 'NOT FOUND') . ")<br>
-            <b>PhpOffice Dir:</b> " . $phpofficePath . " (" . $hasPhpOfficeDir . ")<br>
-            <b>Class PhpSpreadsheet Exists:</b> " . $classSpreadsheet . "<br><br>
-            
-            <b>Isi Folder Vendor:</b><br>
-            <pre>" . (is_dir($vendorPath) ? implode("\n", array_slice(scandir($vendorPath), 0, 30)) : 'None') . "</pre>";
+            <b>SimpleXlsxExporter Test:</b> <span style='color:blue; font-weight:bold;'>" . $testExporter . "</span><br>";
 });
 
 // ============================================================
