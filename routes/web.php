@@ -154,13 +154,26 @@ Route::get('/cek-env-google', function () {
     $envContent = preg_replace('/(DB_PASSWORD=).*/', '$1********', $envContent);
     $envContent = preg_replace('/(GOOGLE_CLIENT_SECRET=).*/', '$1********', $envContent);
 
-    return "<h2 style='color:red;'>HASIL CEK DI DALAM SERVER DOCKER</h2>
-            <b>1. Nilai dari Config Laravel (yang dipakai web saat ini):</b><br>
-            Client ID: " . config('services.google.client_id') . "<br>
-            Redirect: " . config('services.google.redirect') . "<br><br>
+    $extensions = get_loaded_extensions();
+    $hasGd = extension_loaded('gd') ? 'YES' : 'NO';
+    $hasZip = extension_loaded('zip') ? 'YES' : 'NO';
+    $hasPdoMysql = extension_loaded('pdo_mysql') ? 'YES' : 'NO';
+    $vendorPath = base_path('vendor');
+    $phpofficePath = base_path('vendor/phpoffice');
+    $hasPhpOfficeDir = is_dir($phpofficePath) ? 'YES' : 'NO';
+    $classSpreadsheet = class_exists(\PhpOffice\PhpSpreadsheet\Spreadsheet::class) ? 'YES' : 'NO';
+
+    return "<h2 style='color:green;'>DIAGNOSTIK SERVER DOCKER</h2>
+            <b>PHP Version:</b> " . phpversion() . "<br>
+            <b>Extension GD:</b> " . $hasGd . "<br>
+            <b>Extension ZIP:</b> " . $hasZip . "<br>
+            <b>Extension PDO MySQL:</b> " . $hasPdoMysql . "<br>
+            <b>Vendor Path:</b> " . $vendorPath . " (" . (is_dir($vendorPath) ? 'EXISTS' : 'NOT FOUND') . ")<br>
+            <b>PhpOffice Dir:</b> " . $phpofficePath . " (" . $hasPhpOfficeDir . ")<br>
+            <b>Class PhpSpreadsheet Exists:</b> " . $classSpreadsheet . "<br><br>
             
-            <b>2. Isi File .env Asli di Dalam Docker (" . $envPath . "):</b><br>
-            <textarea style='width:100%; height:400px; background:#222; color:#0f0; padding:10px; font-family:monospace;'>" . htmlspecialchars($envContent) . "</textarea>";
+            <b>Isi Folder Vendor:</b><br>
+            <pre>" . (is_dir($vendorPath) ? implode("\n", array_slice(scandir($vendorPath), 0, 30)) : 'None') . "</pre>";
 });
 
 // ============================================================
@@ -193,9 +206,9 @@ Route::get('/update-rahasia-dpm', function () {
     putenv('COMPOSER_HOME=/tmp');
     $output3 = shell_exec("cd \"$repoDir\" && composer install --no-interaction --prefer-dist --optimize-autoloader 2>&1");
     $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
-      $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
-      $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
-      $output_dbseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=DatabaseSeeder --force 2>&1");
+    $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
+    $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
+    $output_dbseed = "DatabaseSeeder dilewati agar tidak duplicate data.";
       
       // Auto backfill tiket anonim ke pemiliknya
       $backfillLogs = [];
