@@ -80,10 +80,34 @@
         
         <!-- Pie Chart & Leaderboard -->
         <div class="space-y-6 lg:col-span-1">
-            <!-- Pie Chart -->
+            <!-- Proker Mendatang & Berjalan (Menggantikan Chart) -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Status Program Kerja</h3>
-                <div id="chart-proker" wire:ignore class="flex justify-center h-48"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
+                    <a href="{{ route('eksekutif.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
+                </div>
+                <div class="space-y-4">
+                    @forelse($upcomingProkers as $proker)
+                    <div class="flex flex-col gap-1 border-b border-slate-50 pb-3 last:border-0 last:pb-0">
+                        <div class="flex items-center justify-between">
+                            <p class="font-bold text-slate-800 text-sm truncate pr-2">{{ $proker->nama }}</p>
+                            <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                                {{ $proker->status === 'rencana' ? 'bg-slate-100 text-slate-700' : '' }}
+                                {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700 animate-pulse' : '' }}
+                                {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
+                                {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
+                                {{ $proker->status }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-slate-500">
+                            <span class="font-semibold text-indigo-600">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? '-' }}</span>
+                            <span>{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M') : '-' }}</span>
+                        </div>
+                    </div>
+                    @empty
+                    <p class="text-sm text-slate-500 text-center py-4">Belum ada program kerja.</p>
+                    @endforelse
+                </div>
             </div>
 
             <!-- Leaderboard -->
@@ -113,59 +137,7 @@
         </div>
     </div>
 
-    <!-- Upcoming Prokers -->
-    <div class="mt-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h3 class="text-lg font-bold text-slate-800">Proker Mendatang & Berjalan</h3>
-                <p class="text-sm text-slate-500">Program kerja yang akan atau sedang berlangsung dalam waktu dekat.</p>
-            </div>
-            <a href="{{ route('eksekutif.proker.index') }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                        <th class="pb-3 px-4">Nama Program</th>
-                        <th class="pb-3 px-4">Organisasi</th>
-                        <th class="pb-3 px-4">Tanggal Mulai</th>
-                        <th class="pb-3 px-4 text-right">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    @forelse($upcomingProkers as $proker)
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="py-3 px-4">
-                            <p class="font-bold text-slate-800 text-sm">{{ $proker->nama }}</p>
-                            <p class="text-xs text-slate-500 mt-0.5">{{ $proker->kategori === 'lainnya' ? $proker->kategori_lainnya : $proker->kategori }}</p>
-                        </td>
-                        <td class="py-3 px-4">
-                            <span class="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-slate-100 text-slate-600">
-                                {{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? '-' }}
-                            </span>
-                        </td>
-                        <td class="py-3 px-4 text-sm text-slate-600 font-medium">
-                            {{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M Y') : 'Belum Ditetapkan' }}
-                        </td>
-                        <td class="py-3 px-4 text-right">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                                {{ $proker->status === 'rencana' ? 'bg-slate-100 text-slate-700' : '' }}
-                                {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700 animate-pulse' : '' }}
-                                {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
-                                {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
-                                {{ $proker->status }}
-                            </span>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="py-6 text-center text-sm text-slate-500">Belum ada program kerja yang direncanakan atau berjalan.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
+
 
     @script
     <script>
@@ -216,48 +188,6 @@
         const chartPengaduan = new window.ApexCharts(document.querySelector("#chart-pengaduan"), optionsPengaduan);
         chartPengaduan.render();
 
-        // Chart Proker (Donut)
-        const prokerStatusData = @json($prokerStatusChart);
-        const optionsProker = {
-            series: prokerStatusData,
-            labels: ['Rencana', 'Berjalan', 'Selesai', 'Dibatalkan'],
-            chart: {
-                type: 'donut',
-                fontFamily: 'Inter, sans-serif',
-                height: 220
-            },
-            colors: ['#cbd5e1', '#0ea5e9', '#10b981', '#f43f5e'], // Slate 300, Sky 500, Emerald 500, Rose 500
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '70%',
-                        labels: {
-                            show: true,
-                            name: { show: false },
-                            value: {
-                                show: true,
-                                fontSize: '24px',
-                                fontWeight: 800,
-                                color: '#1e293b'
-                            },
-                            total: {
-                                show: true,
-                                showAlways: true,
-                                label: 'Total',
-                                fontSize: '12px',
-                                color: '#64748b'
-                            }
-                        }
-                    }
-                }
-            },
-            dataLabels: { enabled: false },
-            legend: { show: false },
-            stroke: { show: false }
-        };
-
-        const chartProker = new window.ApexCharts(document.querySelector("#chart-proker"), optionsProker);
-        chartProker.render();
     </script>
     @endscript
 </div>

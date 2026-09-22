@@ -10,6 +10,7 @@
         <link rel="icon" type="image/png" href="{{ asset('images/icon_dpm.png') }}">
 
         <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts" data-navigate-track="true"></script>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <style>[x-cloak] { display: none !important; }</style>
     </head>
@@ -104,10 +105,7 @@
                     
                 </main>
             </div>
-        </div>
-
-        <!-- External Scripts -->
-        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <!-- HEIC converter & SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
