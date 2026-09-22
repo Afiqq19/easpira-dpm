@@ -74,8 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('dashboard', \App\Livewire\Eksekutif\Dashboard::class)->name('dashboard');
         // Pantau Program Kerja Organisasi (Read Only)
         Route::get('proker', \App\Livewire\Organisasi\KelolaProker::class)->name('proker.index');
-        // Pantau Evaluasi Proker
-        Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
+        // Pantau Pengaduan Mahasiswa (Read Only)
+        Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
+        Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
     });
 
     // 2. STAFF DEWAN ROUTES
