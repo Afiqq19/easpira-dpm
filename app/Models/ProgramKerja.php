@@ -24,6 +24,7 @@ class ProgramKerja extends Model
         'kategori',
         'kategori_lainnya',
         'is_active',
+        'file_proposal',
     ];
 
     protected $casts = [

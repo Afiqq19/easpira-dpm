@@ -30,6 +30,8 @@ class KelolaProkerKegiatan extends Component
     public $kategori = 'akademik';
     public $kategori_lainnya = '';
     public $is_active = true;
+    public $file_proposal;
+    public $existing_file_proposal;
 
     // Kegiatan Form
     public $kegiatan_id, $judul, $deskripsi_kegiatan, $tgl_mulai_kegiatan, $tgl_selesai_kegiatan, $lokasi;
@@ -122,6 +124,7 @@ class KelolaProkerKegiatan extends Component
         $this->kategori = $proker->kategori;
         $this->kategori_lainnya = $proker->kategori_lainnya;
         $this->is_active = $proker->is_active;
+        $this->existing_file_proposal = $proker->file_proposal;
 
         $this->isProkerModalOpen = true;
     }
@@ -136,6 +139,10 @@ class KelolaProkerKegiatan extends Component
             'status' => 'required|in:rencana,berjalan,selesai,dibatalkan',
             'kategori' => 'required|in:akademik,sosial,olahraga,seni,lainnya',
             'kategori_lainnya' => 'required_if:kategori,lainnya|nullable|string|max:255',
+            'file_proposal' => 'nullable|mimes:pdf|max:4096',
+        ], [
+            'file_proposal.mimes' => 'File proposal harus berformat PDF.',
+            'file_proposal.max' => 'Ukuran file proposal maksimal 4MB.',
         ]);
         
         $user = auth()->user();
@@ -157,6 +164,17 @@ class KelolaProkerKegiatan extends Component
                 'periode_id' => $this->periode_id,
             ]
         );
+        
+        $proker = ProgramKerja::find($this->proker_id ?? ProgramKerja::latest()->first()->id);
+
+        if ($this->file_proposal) {
+            if ($proker->file_proposal && \Illuminate\Support\Facades\Storage::disk('public')->exists($proker->file_proposal)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($proker->file_proposal);
+            }
+            $fileName = uniqid('proposal_') . '.pdf';
+            $path = $this->file_proposal->storeAs('proker_proposals', $fileName, 'public');
+            $proker->update(['file_proposal' => $path]);
+        }
 
         $this->isProkerModalOpen = false;
         session()->flash('message', $this->proker_id ? 'Program kerja diperbarui.' : 'Program kerja ditambahkan.');
@@ -246,10 +264,22 @@ class KelolaProkerKegiatan extends Component
     public function delete()
     {
         if ($this->deleteType === 'proker') {
-            ProgramKerja::findOrFail($this->deleteId)->delete();
+            $proker = ProgramKerja::find($this->deleteId);
+            if ($proker) {
+                if ($proker->file_proposal && \Illuminate\Support\Facades\Storage::disk('public')->exists($proker->file_proposal)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($proker->file_proposal);
+                }
+                $proker->delete();
+            }
             session()->flash('message', 'Program kerja berhasil dihapus.');
-        } elseif ($this->deleteType === 'kegiatan') {
-            Kegiatan::findOrFail($this->deleteId)->delete();
+        } else {
+            $keg = Kegiatan::find($this->deleteId);
+            if ($keg) {
+                if ($keg->poster && \Illuminate\Support\Facades\Storage::disk('public')->exists($keg->poster)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($keg->poster);
+                }
+                $keg->delete();
+            }
             session()->flash('message', 'Kegiatan berhasil dihapus.');
         }
         
@@ -267,6 +297,8 @@ class KelolaProkerKegiatan extends Component
         $this->kategori = 'akademik';
         $this->kategori_lainnya = '';
         $this->is_active = true;
+        $this->file_proposal = null;
+        $this->existing_file_proposal = null;
         $this->resetErrorBag();
     }
 

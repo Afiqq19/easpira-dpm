@@ -72,6 +72,12 @@
                             <div class="mt-2 text-xs text-slate-400 flex gap-4">
                                 <span><i class="fas fa-calendar mr-1"></i> {{ $proker->tanggal_mulai ? \Carbon\Carbon::parse($proker->tanggal_mulai)->translatedFormat('d M Y') : '-' }} s/d {{ $proker->tanggal_selesai ? \Carbon\Carbon::parse($proker->tanggal_selesai)->translatedFormat('d M Y') : '-' }}</span>
                                 <span><i class="fas fa-list mr-1"></i> {{ $proker->kegiatan->count() }} Kegiatan</span>
+                                @if($proker->file_proposal)
+                                    <a href="{{ asset('storage/' . $proker->file_proposal) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1" wire:click.stop title="Lihat Proposal">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        Proposal
+                                    </a>
+                                @endif
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
@@ -117,7 +123,7 @@
                                 @endforeach
                             </div>
                         @else
-                            <p class="text-sm text-slate-500 italic">Belum ada kegiatan untuk program kerja ini.</p>
+                            <p class="text-sm text-slate-500 italic">Rincian kegiatan belum ditambahkan (opsional).</p>
                         @endif
                     </div>
                 </div>
@@ -205,6 +211,15 @@
                                 @error('kategori_lainnya') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
                             </div>
                         @endif
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">File Proposal (Opsional, PDF maks 4MB)</label>
+                            <input type="file" wire:model="file_proposal" accept="application/pdf" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors">
+                            @if($existing_file_proposal)
+                                <p class="text-xs text-slate-500 mt-2">File saat ini: <a href="{{ asset('storage/' . $existing_file_proposal) }}" target="_blank" class="text-indigo-600 hover:underline">Lihat Proposal</a></p>
+                            @endif
+                            @error('file_proposal') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                        </div>
                     </div>
                     
                     <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
