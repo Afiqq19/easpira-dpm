@@ -107,6 +107,9 @@ class DetailPengaduan extends Component
     {
         $this->validate([
             'isi_tanggapan' => 'required|string|min:5',
+        ], [
+            'isi_tanggapan.required' => 'Tanggapan tidak boleh kosong.',
+            'isi_tanggapan.min' => 'Tanggapan harus berisi minimal 5 karakter.',
         ]);
 
         TanggapanPengaduan::create([
