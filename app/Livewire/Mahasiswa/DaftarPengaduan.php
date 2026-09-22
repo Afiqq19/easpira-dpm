@@ -24,13 +24,33 @@ class DaftarPengaduan extends Component
         ]);
 
         // Cek apakah tiket ada
-        $exists = Pengaduan::where('ticket_code', $this->searchTicketCode)->exists();
+        $ticket = Pengaduan::where('ticket_code', trim($this->searchTicketCode))->first();
 
-        if ($exists) {
-            return redirect()->route('mahasiswa.pengaduan.detail', $this->searchTicketCode);
-        } else {
+        if (!$ticket) {
             $this->addError('searchTicketCode', 'Nomor tiket tidak ditemukan.');
+            return;
         }
+
+        // Cek apakah tiket ini milik akun yang sedang login
+        $isOwner = ($ticket->user_id == Auth::id());
+        if (!$isOwner && is_null($ticket->user_id) && $ticket->mode_privasi === 'anonim') {
+            try {
+                $enkripsiService = app(\App\Services\EnkripsiIdentitasService::class);
+                $identitas = $enkripsiService->bukaIdentitas($ticket);
+                if ($identitas && isset($identitas['user_id']) && $identitas['user_id'] == Auth::id()) {
+                    $ticket->user_id = Auth::id();
+                    $ticket->saveQuietly();
+                    $isOwner = true;
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        if (!$isOwner) {
+            $this->addError('searchTicketCode', 'Akses ditolak: Tiket ini bukan milik akun Anda.');
+            return;
+        }
+
+        return redirect()->route('mahasiswa.pengaduan.detail', $ticket->ticket_code);
     }
 
     public function render()

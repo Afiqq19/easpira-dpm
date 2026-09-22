@@ -116,6 +116,7 @@ class DetailPengaduan extends Component
             'pengaduan_id' => $this->pengaduan->id,
             'user_id' => Auth::id(),
             'isi_tanggapan' => $this->isi_tanggapan,
+            'tipe' => 'staff',
             'is_internal' => $this->is_internal,
         ]);
 

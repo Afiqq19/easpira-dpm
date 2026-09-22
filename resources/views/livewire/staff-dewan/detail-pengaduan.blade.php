@@ -237,11 +237,21 @@
                         @forelse($pengaduan->tanggapans as $tanggapan)
                             <div class="flex gap-3 {{ $tanggapan->user_id === Auth::id() ? 'flex-row-reverse' : '' }}">
                                 <div class="w-8 h-8 rounded-full flex-shrink-0 {{ $tanggapan->user_id === Auth::id() ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600' }} flex items-center justify-center font-bold text-xs">
-                                    {{ substr($tanggapan->user->nama ?? 'A', 0, 1) }}
+                                    @if($pengaduan->mode_privasi === 'anonim' && ($tanggapan->tipe === 'mahasiswa' || ($tanggapan->user && $tanggapan->user->hasRole('mahasiswa')) || $tanggapan->user_id === $pengaduan->user_id))
+                                        ?
+                                    @else
+                                        {{ substr($tanggapan->user->nama ?? 'A', 0, 1) }}
+                                    @endif
                                 </div>
                                 <div class="max-w-[80%] rounded-2xl p-4 {{ $tanggapan->is_internal ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-tr-none' : ($tanggapan->user_id === Auth::id() ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-tl-none') }}">
                                     <div class="flex items-center justify-between gap-4 mb-1">
-                                        <span class="text-xs font-bold {{ $tanggapan->is_internal ? 'text-amber-800' : ($tanggapan->user_id === Auth::id() ? 'text-indigo-100' : 'text-slate-600') }}">{{ $tanggapan->user->nama ?? 'Staff' }}</span>
+                                        <span class="text-xs font-bold {{ $tanggapan->is_internal ? 'text-amber-800' : ($tanggapan->user_id === Auth::id() ? 'text-indigo-100' : 'text-slate-600') }}">
+                                            @if($pengaduan->mode_privasi === 'anonim' && ($tanggapan->tipe === 'mahasiswa' || ($tanggapan->user && $tanggapan->user->hasRole('mahasiswa')) || $tanggapan->user_id === $pengaduan->user_id))
+                                                Pelapor (Anonim)
+                                            @else
+                                                {{ $tanggapan->user->nama ?? 'Staff' }}
+                                            @endif
+                                        </span>
                                         @if($tanggapan->is_internal)
                                             <span class="text-[10px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded uppercase">Internal</span>
                                         @endif

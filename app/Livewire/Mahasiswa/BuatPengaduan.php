@@ -116,8 +116,10 @@ class BuatPengaduan extends Component
             $pengaduan->lampiran = $lampiranPaths;
         }
 
+        $pengaduan->user_id = Auth::id(); // Selalu catat pemilik tiket agar masuk ke riwayat pengaduan mahasiswa
+
         if ($mode_privasi === 'anonim') {
-            $pengaduan->user_id = null;
+            $pengaduan->kode_anonim = Pengaduan::generateKodeAnonim();
             $pengaduan->save();
             
             $enkripsiService->simpanIdentitas($pengaduan, [
@@ -127,7 +129,6 @@ class BuatPengaduan extends Component
                 'email'   => Auth::user()->email,
             ]);
         } else {
-            $pengaduan->user_id = Auth::id();
             $pengaduan->save();
         }
 

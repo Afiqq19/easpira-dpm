@@ -75,15 +75,18 @@ class TanggapanPengaduan extends Model
             return 'Sistem e-Aspira';
         }
 
-        if ($this->tipe === 'staff') {
-            return 'Staff DPM Polmed';
+        // Cek jika ini dari staff / pengelola
+        $isStaff = ($this->tipe === 'staff') || ($this->user && $this->user->hasAnyRole(['admin', 'staff_dewan', 'direktur', 'wakil_direktur']));
+
+        if ($isStaff) {
+            return $this->user?->nama ?? 'Staff DPM';
         }
 
-        // Untuk mahasiswa — cek mode privasi pengaduan
+        // Untuk mahasiswa / pelapor — jika tiket anonim, selalu sembunyikan nama asli!
         if ($this->pengaduan?->mode_privasi === 'anonim') {
-            return $this->pengaduan->kode_anonim ?? 'Pelapor Anonim';
+            return 'Pelapor (Anonim)';
         }
 
-        return $this->user?->nama ?? 'Tidak Diketahui';
+        return $this->user?->nama ?? 'Mahasiswa';
     }
 }

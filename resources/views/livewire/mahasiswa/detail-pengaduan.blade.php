@@ -175,7 +175,16 @@
                                     <!-- Card -->
                                     <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
                                         <div class="flex items-center justify-between mb-1">
-                                            <div class="font-bold text-slate-800 text-sm">{{ $tanggapan->user->nama ?? 'Staff DPM' }}</div>
+                                            <div class="font-bold text-slate-800 text-sm">
+                                                @if($pengaduan->mode_privasi === 'anonim' && ($tanggapan->tipe === 'mahasiswa' || ($tanggapan->user && $tanggapan->user->hasRole('mahasiswa')) || $tanggapan->user_id === $pengaduan->user_id))
+                                                    <span class="inline-flex items-center gap-1.5 text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md text-xs font-bold border border-indigo-100">
+                                                        <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                                        Pelapor (Anonim)
+                                                    </span>
+                                                @else
+                                                    {{ $tanggapan->user->nama ?? 'Staff DPM' }}
+                                                @endif
+                                            </div>
                                             <time class="text-xs font-medium text-slate-400">{{ $tanggapan->created_at->diffForHumans() }}</time>
                                         </div>
                                         <div class="text-slate-600 text-sm">

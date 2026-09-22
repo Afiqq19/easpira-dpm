@@ -17,18 +17,37 @@ class DetailPengaduan extends Component
     {
         $this->ticket_code = $ticket_code;
         
-        // Cari pengaduan milik user yang login
-        $this->pengaduan = Pengaduan::with(['kategori', 'tanggapansPublik.user'])
+        $pengaduan = Pengaduan::with(['kategori', 'tanggapansPublik.user'])
             ->where('ticket_code', $ticket_code)
-            ->where(function($query) {
-                // Pastikan hanya bisa dilihat oleh si pembuat laporan
-                $query->where('user_id', Auth::id())
-                      // Atau jika anonim, kita cek apakah ada relasi di tabel identitas (butuh join/subquery), 
-                      // tapi karena mahasiswa login, pengaduan anonim tidak punya user_id di tabel utama.
-                      // Solusi: Kita izinkan jika dia tau ticket_code (seperti resi pengiriman).
-                      ->orWhereNull('user_id');
-            })
-            ->firstOrFail();
+            ->first();
+
+        if (!$pengaduan) {
+            abort(404, 'Nomor tiket tidak ditemukan.');
+        }
+
+        // Validasi kepemilikan tiket: Hanya pembuat laporan yang boleh melihat
+        $isOwner = ($pengaduan->user_id == Auth::id());
+
+        // Jika user_id masih null (tiket anonim lama), cek apakah milik user yang sedang login
+        if (!$isOwner && is_null($pengaduan->user_id) && $pengaduan->mode_privasi === 'anonim') {
+            try {
+                $enkripsiService = app(\App\Services\EnkripsiIdentitasService::class);
+                $identitas = $enkripsiService->bukaIdentitas($pengaduan);
+                if ($identitas && isset($identitas['user_id']) && $identitas['user_id'] == Auth::id()) {
+                    $pengaduan->user_id = Auth::id();
+                    $pengaduan->saveQuietly();
+                    $isOwner = true;
+                }
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+        }
+
+        if (!$isOwner) {
+            abort(403, 'Akses Ditolak: Anda tidak memiliki izin untuk mengakses tiket pengaduan ini.');
+        }
+
+        $this->pengaduan = $pengaduan;
     }
 
     public $isi_tanggapan;
@@ -44,9 +63,10 @@ class DetailPengaduan extends Component
 
         \App\Models\TanggapanPengaduan::create([
             'pengaduan_id' => $this->pengaduan->id,
-            'user_id' => Auth::id(), // null jika guest, tapi pelapor sudah login
+            'user_id' => Auth::id(),
             'isi_tanggapan' => $this->isi_tanggapan,
-            'is_internal' => false, // Mahasiswa tidak bisa bikin internal
+            'tipe' => 'mahasiswa',
+            'is_internal' => false,
         ]);
 
         // Refresh tanggapan

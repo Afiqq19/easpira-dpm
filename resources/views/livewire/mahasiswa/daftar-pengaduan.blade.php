@@ -26,11 +26,14 @@
                 <div class="glass p-6 rounded-2xl hover:shadow-lg hover:shadow-indigo-500/10 transition-all border border-slate-100 relative overflow-hidden group">
                     <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-4">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-mono text-sm font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">{{ $p->ticket_code }}</span>
                                 <span class="text-xs text-slate-400">{{ $p->created_at->format('d M Y, H:i') }}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ $p->mode_privasi === 'anonim' ? 'bg-slate-800 text-white' : 'bg-emerald-100 text-emerald-700' }}">
+                                    {{ $p->mode_privasi === 'anonim' ? 'Anonim' : 'Umum' }}
+                                </span>
                             </div>
-                            <span class="inline-block mt-2 px-3 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
+                            <span class="inline-block mt-1 px-3 py-1 bg-slate-100 text-slate-700 text-xs font-semibold rounded-full">
                                 {{ $p->kategori->nama_kategori ?? 'Umum' }}
                             </span>
                         </div>
@@ -66,7 +69,7 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     </div>
                     <h4 class="text-lg font-bold text-slate-800 mb-2">Belum ada pengaduan</h4>
-                    <p class="text-slate-500 text-sm max-w-md">Anda belum pernah membuat pengaduan umum. Jika Anda menggunakan mode Anonim, silakan lacak menggunakan Nomor Tiket.</p>
+                    <p class="text-slate-500 text-sm max-w-md">Anda belum pernah membuat pengaduan. Semua pengaduan Anda, baik umum maupun anonim, akan tercatat dengan aman di sini.</p>
                 </div>
             @endforelse
             
@@ -102,11 +105,11 @@
             
             <div class="mt-6 glass p-6 rounded-2xl">
                 <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Informasi
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    Privasi & Keamanan Terjamin
                 </h4>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Setiap pengaduan yang menggunakan mode <strong>Anonim</strong> akan disembunyikan identitasnya dan tidak muncul di daftar riwayat ini untuk keamanan. Harap simpan Kode Tiket Anda dengan baik.
+                    Semua laporan Anda (termasuk mode <strong>Anonim</strong>) tersimpan aman di akun Anda dan dapat Anda pantau setiap saat tanpa khawatir kehilangan nomor tiket. Identitas Anda untuk tiket anonim tetap 100% dirahasiakan dan dienkripsi dari staf biasa.
                 </p>
             </div>
         </div>
