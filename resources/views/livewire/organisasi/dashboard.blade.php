@@ -89,7 +89,7 @@
     <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-lg font-bold text-slate-800">5 Ulasan Terbaru</h3>
-            <a href="{{ route('organisasi.evaluasi.index') }}" wire:navigate class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
+            <a href="{{ route('organisasi.evaluasi-proker.index') }}" wire:navigate class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
         </div>
         <div class="space-y-4">
             @forelse($recentEvaluasi as $eval)
