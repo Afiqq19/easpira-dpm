@@ -62,7 +62,7 @@ class Dashboard extends Component
         $upcomingProkers = ProgramKerja::with('organisasi')
             ->orderByRaw("FIELD(status, 'berjalan', 'rencana', 'selesai', 'dibatalkan')")
             ->orderBy('tanggal_mulai', 'asc')
-            ->take(5)
+            ->take(2)
             ->get();
 
         return view('livewire.admin.dashboard', compact(

@@ -55,14 +55,14 @@ class Dashboard extends Component
         // 4. LEADERBOARD: Organisasi dengan Proker Terbanyak
         $leaderboard = Organisasi::withCount('programKerja')
             ->orderBy('program_kerja_count', 'desc')
-            ->take(5)
+            ->take(3)
             ->get();
 
         // 5. UPCOMING PROKERS: Proker yang mau jalan / sedang berjalan
         $upcomingProkers = ProgramKerja::with('organisasi')
             ->orderByRaw("FIELD(status, 'berjalan', 'rencana', 'selesai', 'dibatalkan')")
             ->orderBy('tanggal_mulai', 'asc')
-            ->take(5)
+            ->take(2)
             ->get();
 
         return view('livewire.eksekutif.dashboard', compact(
