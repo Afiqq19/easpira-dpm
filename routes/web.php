@@ -169,7 +169,7 @@ Route::get('/update-rahasia-dpm', function () {
       $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
       $output_dbseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=DatabaseSeeder --force 2>&1");
-    $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
+    $output_optimize = shell_exec("cd \"$repoDir\" && php artisan optimize 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
     
     // Catatan: Jika NPM/Node.js belum terinstall di Docker ini, outputnya mungkin "command not found"
@@ -192,8 +192,8 @@ Route::get('/update-rahasia-dpm', function () {
 " . htmlspecialchars((string) $output_katseed) . "
 " . htmlspecialchars((string) $output_dbseed) . "
 
-[CLEAR CACHE & STORAGE LINK]
-" . htmlspecialchars((string) $output_clear) . "
+[OPTIMIZE & CACHE]
+" . htmlspecialchars((string) $output_optimize) . "
 " . htmlspecialchars((string) $output_link) . "
 
 [NPM BUILD (TAMPILAN)]
