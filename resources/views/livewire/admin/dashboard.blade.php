@@ -70,73 +70,81 @@
         </div>
     </div>
 
-    <!-- Tren Pengaduan Chart (Full Width) -->
-    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-        <h3 class="text-lg font-bold text-slate-800 mb-4">Tren Pengaduan (6 Bulan Terakhir)</h3>
-        <div id="chart-pengaduan" wire:ignore class="w-full h-72"></div>
-    </div>
-
-    <!-- Proker Mendatang & Organisasi Teraktif (Side by Side) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Proker Mendatang -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+    <!-- Charts & Proker Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Line Chart (2 Cols) -->
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 lg:col-span-2 min-w-0 overflow-hidden flex flex-col justify-between">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
-                <a href="{{ route('admin.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
-            </div>
-            <div class="space-y-3">
-                @forelse($upcomingProkers as $proker)
-                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/50 transition-colors">
-                    <div class="flex-1 min-w-0 mr-3">
-                        <p class="font-bold text-slate-800 text-sm truncate">{{ $proker->nama }}</p>
-                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                            <span class="font-semibold text-indigo-600">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? '-' }}</span>
-                            <span>&bull;</span>
-                            <span>{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M Y') : '-' }}</span>
-                        </div>
-                    </div>
-                    <span class="inline-flex flex-shrink-0 items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                        {{ $proker->status === 'rencana' ? 'bg-slate-200 text-slate-700' : '' }}
-                        {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700' : '' }}
-                        {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
-                        {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
-                        {{ $proker->status }}
-                    </span>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Tren Pengaduan</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Statistik 6 bulan terakhir</p>
                 </div>
-                @empty
-                <p class="text-sm text-slate-500 text-center py-6">Belum ada program kerja.</p>
-                @endforelse
+            </div>
+            <div class="w-full min-w-0 overflow-hidden">
+                <div id="chart-pengaduan" wire:ignore class="w-full"></div>
             </div>
         </div>
 
-        <!-- Organisasi Teraktif -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Organisasi Teraktif</h3>
-            <ul class="space-y-3">
-                @forelse($leaderboard as $idx => $org)
-                <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full font-bold text-sm flex items-center justify-center
-                            {{ $idx === 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500' }}">
-                            {{ $idx + 1 }}
+        <!-- Right Column: Proker Mendatang & Organisasi Teraktif (1 Col) -->
+        <div class="space-y-6 lg:col-span-1 min-w-0">
+            <!-- Proker Mendatang -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 min-w-0">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
+                    <a href="{{ route('admin.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
+                </div>
+                <div class="space-y-3">
+                    @forelse($upcomingProkers as $proker)
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/50 transition-colors">
+                        <div class="flex-1 min-w-0 mr-3">
+                            <p class="font-bold text-slate-800 text-sm truncate">{{ $proker->nama }}</p>
+                            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                                <span class="font-semibold text-indigo-600 truncate">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? '-' }}</span>
+                                <span>&bull;</span>
+                                <span class="shrink-0">{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M Y') : '-' }}</span>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-slate-800">{{ $org->singkatan ?? $org->nama }}</p>
-                            <p class="text-xs text-slate-500">{{ $org->tipe }}</p>
-                        </div>
+                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                            {{ $proker->status === 'rencana' ? 'bg-slate-200 text-slate-700' : '' }}
+                            {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700' : '' }}
+                            {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
+                            {{ $proker->status === 'dibatalkan' ? 'bg-rose-100 text-rose-700' : '' }}">
+                            {{ $proker->status }}
+                        </span>
                     </div>
-                    <span class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold bg-indigo-50 text-indigo-700 rounded-lg">
-                        {{ $org->program_kerja_count }} Proker
-                    </span>
-                </li>
-                @empty
-                <li class="text-sm text-slate-500 text-center py-6">Belum ada data organisasi.</li>
-                @endforelse
-            </ul>
+                    @empty
+                    <p class="text-sm text-slate-500 text-center py-6">Belum ada program kerja.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Organisasi Teraktif -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 min-w-0">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Organisasi Teraktif</h3>
+                <ul class="space-y-3">
+                    @forelse($leaderboard as $idx => $org)
+                    <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
+                        <div class="flex items-center gap-3 min-w-0 mr-2">
+                            <div class="w-8 h-8 rounded-full font-bold text-sm flex items-center justify-center shrink-0
+                                {{ $idx === 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500' }}">
+                                {{ $idx + 1 }}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-slate-800 truncate">{{ $org->singkatan ?? $org->nama }}</p>
+                                <p class="text-xs text-slate-500 truncate">{{ $org->tipe }}</p>
+                            </div>
+                        </div>
+                        <span class="inline-flex shrink-0 items-center justify-center px-2.5 py-1 text-xs font-bold bg-indigo-50 text-indigo-700 rounded-lg">
+                            {{ $org->program_kerja_count }} Proker
+                        </span>
+                    </li>
+                    @empty
+                    <li class="text-sm text-slate-500 text-center py-6">Belum ada data organisasi.</li>
+                    @endforelse
+                </ul>
+            </div>
         </div>
     </div>
-
-
 
     <script>
         document.addEventListener('livewire:navigated', function() {
@@ -156,43 +164,103 @@
                     data: selesaiChart
                 }],
                 chart: {
-                    height: 320,
                     type: 'area',
+                    height: 340,
+                    width: '100%',
                     fontFamily: 'Inter, sans-serif',
                     toolbar: { show: false },
-                    zoom: { enabled: false }
+                    zoom: { enabled: false },
+                    parentHeightOffset: 0
                 },
                 colors: ['#e11d48', '#059669'],
                 dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 3 },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
                 fill: {
                     type: 'gradient',
                     gradient: {
                         shadeIntensity: 1,
-                        opacityFrom: 0.4,
+                        opacityFrom: 0.35,
                         opacityTo: 0.05,
                         stops: [0, 90, 100]
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 4,
+                    padding: {
+                        top: 0,
+                        right: 25,
+                        bottom: 0,
+                        left: 10
                     }
                 },
                 xaxis: {
                     categories: bulanList,
                     axisBorder: { show: false },
-                    axisTicks: { show: false }
+                    axisTicks: { show: false },
+                    labels: {
+                        style: {
+                            colors: '#64748b',
+                            fontSize: '11px',
+                            fontFamily: 'Inter, sans-serif'
+                        }
+                    },
+                    tooltip: { enabled: false }
                 },
                 yaxis: {
-                    labels: { formatter: function(val) { return Math.floor(val) } },
+                    labels: {
+                        formatter: function(val) { return Math.floor(val) },
+                        style: {
+                            colors: '#64748b',
+                            fontSize: '11px',
+                            fontFamily: 'Inter, sans-serif'
+                        }
+                    },
                     min: 0,
                     forceNiceScale: true
                 },
-                legend: { position: 'top', horizontalAlign: 'right' }
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    offsetY: -5,
+                    fontSize: '12px',
+                    fontFamily: 'Inter, sans-serif',
+                    markers: {
+                        radius: 12
+                    },
+                    itemMargin: {
+                        horizontal: 8
+                    }
+                }
             };
 
             function renderChart() {
                 if (typeof window.ApexCharts === 'undefined') return;
                 el.innerHTML = '';
+
+                // Explicit container measurement so it never overflows card
+                var rect = el.getBoundingClientRect();
+                if (rect.width > 0) {
+                    optionsPengaduan.chart.width = Math.floor(rect.width);
+                }
+
                 var chart = new window.ApexCharts(el, optionsPengaduan);
                 chart.render();
                 el.dataset.rendered = 'true';
+
+                window.addEventListener('resize', function() {
+                    if (chart && el && el.parentElement) {
+                        var newWidth = el.parentElement.clientWidth;
+                        if (newWidth > 0) {
+                            chart.updateOptions({
+                                chart: { width: newWidth }
+                            });
+                        }
+                    }
+                });
             }
 
             if (typeof window.ApexCharts !== 'undefined') {
