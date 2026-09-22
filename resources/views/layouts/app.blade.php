@@ -55,13 +55,6 @@
                             <span class="font-heading font-bold text-slate-800 text-sm">e-Aspira <span class="text-indigo-600">DPM</span></span>
                         </div>
 
-                        <!-- Search bar (Desktop only) -->
-                        <form action="{{ route('dashboard.redirect') }}" method="GET" class="relative w-full max-w-md hidden md:block">
-                            <button type="submit" class="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer hover:text-indigo-600 transition-colors">
-                                <svg class="h-5 w-5 text-slate-400 hover:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </button>
-                            <input type="text" name="search" class="block w-full pl-10 pr-3 py-2 border-none rounded-xl bg-slate-100/80 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm" placeholder="Lacak tiket (PLP-...)">
-                        </form>
                     </div>
                     
                     <div class="flex items-center gap-2 sm:gap-4">
