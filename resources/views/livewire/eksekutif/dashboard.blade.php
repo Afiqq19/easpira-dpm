@@ -73,14 +73,32 @@
     <!-- Charts & Proker Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Line Chart (2 Cols) -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 lg:col-span-2 min-w-0 overflow-hidden flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-4">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 lg:col-span-2 min-w-0 overflow-hidden flex flex-col justify-between">
+            <!-- Header with Title & Custom Modern Legend Pills -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                 <div>
-                    <h3 class="text-lg font-bold text-slate-800">Tren Pengaduan</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Statistik 6 bulan terakhir</p>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-2.5 h-6 bg-gradient-to-b from-indigo-500 to-indigo-600 rounded-full"></div>
+                        <h3 class="text-lg font-bold text-slate-800 tracking-tight">Tren Pengaduan Mahasiswa</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 pl-5">Perbandingan laporan masuk vs diselesaikan 6 bulan terakhir</p>
+                </div>
+                
+                <!-- Modern Custom Legend Pills (Never overflows or clips) -->
+                <div class="flex items-center gap-2 self-start sm:self-auto pl-5 sm:pl-0">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50/80 border border-indigo-100 text-xs font-medium text-slate-700 shadow-2xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 ring-4 ring-indigo-100"></span>
+                        <span>Masuk: <strong class="text-indigo-600 font-bold ml-0.5">{{ $totalPengaduan }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50/80 border border-emerald-100 text-xs font-medium text-slate-700 shadow-2xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></span>
+                        <span>Selesai: <strong class="text-emerald-600 font-bold ml-0.5">{{ $pengaduanSelesai }}</strong></span>
+                    </div>
                 </div>
             </div>
-            <div class="w-full min-w-0 overflow-hidden">
+
+            <!-- Chart Container -->
+            <div class="w-full min-w-0 relative">
                 <div id="chart-pengaduan" wire:ignore class="w-full"></div>
             </div>
         </div>
@@ -88,9 +106,12 @@
         <!-- Right Column: Proker Mendatang & Organisasi Teraktif (1 Col) -->
         <div class="space-y-6 lg:col-span-1 min-w-0">
             <!-- Proker Mendatang -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 min-w-0">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 min-w-0">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-bold text-slate-800">Proker Mendatang</h3>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-4 bg-indigo-500 rounded-full"></div>
+                        <h3 class="text-base font-bold text-slate-800">Proker Mendatang</h3>
+                    </div>
                     <a href="{{ route('eksekutif.proker.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Lihat Semua &rarr;</a>
                 </div>
                 <div class="space-y-3">
@@ -104,7 +125,7 @@
                                 <span class="shrink-0">{{ $proker->tanggal_mulai ? $proker->tanggal_mulai->translatedFormat('d M Y') : '-' }}</span>
                             </div>
                         </div>
-                        <span class="inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
+                        <span class="inline-flex flex-shrink-0 items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider
                             {{ $proker->status === 'rencana' ? 'bg-slate-200 text-slate-700' : '' }}
                             {{ $proker->status === 'berjalan' ? 'bg-blue-100 text-blue-700' : '' }}
                             {{ $proker->status === 'selesai' ? 'bg-emerald-100 text-emerald-700' : '' }}
@@ -119,8 +140,11 @@
             </div>
 
             <!-- Organisasi Teraktif -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 min-w-0">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Organisasi Teraktif</h3>
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 min-w-0">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-2 h-4 bg-amber-500 rounded-full"></div>
+                    <h3 class="text-base font-bold text-slate-800">Organisasi Teraktif</h3>
+                </div>
                 <ul class="space-y-3">
                     @forelse($leaderboard as $idx => $org)
                     <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
@@ -165,34 +189,53 @@
                 }],
                 chart: {
                     type: 'area',
-                    height: 340,
+                    height: 290,
                     width: '100%',
                     fontFamily: 'Inter, sans-serif',
                     toolbar: { show: false },
                     zoom: { enabled: false },
-                    parentHeightOffset: 0
+                    parentHeightOffset: 0,
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 500
+                    }
                 },
-                colors: ['#e11d48', '#059669'],
+                colors: ['#6366f1', '#10b981'],
                 dataLabels: { enabled: false },
                 stroke: {
                     curve: 'smooth',
-                    width: 3
+                    width: [3, 3],
+                    lineCap: 'round'
+                },
+                markers: {
+                    size: 4,
+                    colors: ['#ffffff', '#ffffff'],
+                    strokeColors: ['#6366f1', '#10b981'],
+                    strokeWidth: 2.5,
+                    hover: {
+                        size: 7,
+                        sizeOffset: 3
+                    }
                 },
                 fill: {
                     type: 'gradient',
                     gradient: {
+                        type: 'vertical',
                         shadeIntensity: 1,
-                        opacityFrom: 0.35,
-                        opacityTo: 0.05,
-                        stops: [0, 90, 100]
+                        opacityFrom: 0.28,
+                        opacityTo: 0.02,
+                        stops: [0, 95, 100]
                     }
                 },
                 grid: {
                     borderColor: '#f1f5f9',
                     strokeDashArray: 4,
+                    xaxis: { lines: { show: false } },
+                    yaxis: { lines: { show: true } },
                     padding: {
-                        top: 0,
-                        right: 25,
+                        top: -10,
+                        right: 20,
                         bottom: 0,
                         left: 10
                     }
@@ -203,9 +246,10 @@
                     axisTicks: { show: false },
                     labels: {
                         style: {
-                            colors: '#64748b',
+                            colors: '#94a3b8',
                             fontSize: '11px',
-                            fontFamily: 'Inter, sans-serif'
+                            fontFamily: 'Inter, sans-serif',
+                            fontWeight: 500
                         }
                     },
                     tooltip: { enabled: false }
@@ -214,25 +258,30 @@
                     labels: {
                         formatter: function(val) { return Math.floor(val) },
                         style: {
-                            colors: '#64748b',
+                            colors: '#94a3b8',
                             fontSize: '11px',
-                            fontFamily: 'Inter, sans-serif'
+                            fontFamily: 'Inter, sans-serif',
+                            fontWeight: 500
                         }
                     },
                     min: 0,
                     forceNiceScale: true
                 },
                 legend: {
-                    position: 'top',
-                    horizontalAlign: 'right',
-                    offsetY: -5,
-                    fontSize: '12px',
-                    fontFamily: 'Inter, sans-serif',
-                    markers: {
-                        radius: 12
+                    show: false
+                },
+                tooltip: {
+                    theme: 'light',
+                    shared: true,
+                    intersect: false,
+                    style: {
+                        fontSize: '12px',
+                        fontFamily: 'Inter, sans-serif'
                     },
-                    itemMargin: {
-                        horizontal: 8
+                    y: {
+                        formatter: function(val) {
+                            return val + ' Pengaduan';
+                        }
                     }
                 }
             };
@@ -241,7 +290,6 @@
                 if (typeof window.ApexCharts === 'undefined') return;
                 el.innerHTML = '';
 
-                // Explicit container measurement so it never overflows card
                 var rect = el.getBoundingClientRect();
                 if (rect.width > 0) {
                     optionsPengaduan.chart.width = Math.floor(rect.width);
