@@ -14,6 +14,7 @@ class PantauProker extends Component
     use WithPagination;
 
     public $search = '';
+    public $searchOrg = '';
     public $selectedOrganisasi = null;
     public $selectedOrganisasiNama = '';
     public $statusFilter = '';
@@ -21,6 +22,11 @@ class PantauProker extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatingSearchOrg()
+    {
+        // No pagination for orgs currently, just re-render
     }
 
     public function updatingStatusFilter()
@@ -48,9 +54,17 @@ class PantauProker extends Component
     public function render()
     {
         // Daftar organisasi
-        $organisasis = Organisasi::where('is_active', true)
-            ->withCount('programKerja')
-            ->orderBy('tipe')
+        $orgQuery = Organisasi::where('is_active', true)
+            ->withCount('programKerja');
+            
+        if ($this->searchOrg) {
+            $orgQuery->where(function($q) {
+                $q->where('nama', 'like', '%' . $this->searchOrg . '%')
+                  ->orWhere('singkatan', 'like', '%' . $this->searchOrg . '%');
+            });
+        }
+
+        $organisasis = $orgQuery->orderBy('tipe')
             ->orderBy('nama')
             ->get();
 

@@ -13,6 +13,9 @@ class KelolaProker extends Component
     use WithPagination;
 
     public $search = '';
+    public $searchOrg = '';
+    public $selectedOrganisasi = null;
+    public $selectedOrganisasiNama = '';
     public $isModalOpen = false;
     public $isDeleteModalOpen = false;
 
@@ -33,8 +36,38 @@ class KelolaProker extends Component
         'tanggal_selesai.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
     ];
 
+    public function mount()
+    {
+        $user = auth()->user();
+        if (!$user->hasRole(['admin', 'staff_dewan'])) {
+            $this->selectedOrganisasi = $user->organisasi_id;
+            $this->selectedOrganisasiNama = $user->organisasi->singkatan ?? $user->organisasi->nama ?? '';
+        }
+    }
+
     public function updatingSearch()
     {
+        $this->resetPage();
+    }
+
+    public function updatingSearchOrg()
+    {
+        // For search org filtering
+    }
+
+    public function pilihOrganisasi($id)
+    {
+        $org = \App\Models\Organisasi::findOrFail($id);
+        $this->selectedOrganisasi = $id;
+        $this->selectedOrganisasiNama = $org->singkatan ?? $org->nama;
+        $this->resetPage();
+    }
+
+    public function kembaliKeOrganisasi()
+    {
+        $this->selectedOrganisasi = null;
+        $this->selectedOrganisasiNama = '';
+        $this->search = '';
         $this->resetPage();
     }
 
@@ -42,36 +75,45 @@ class KelolaProker extends Component
     {
         $user = auth()->user();
         
-        $query = ProgramKerja::query();
-        
-        // Jika bukan admin/staff dewan, batasi hanya untuk organisasinya sendiri
-        if (!$user->hasRole(['admin', 'staff_dewan'])) {
-            $query->where('organisasi_id', $user->organisasi_id);
+        $organisasis = null;
+        $prokers = null;
+
+        if ($user->hasRole(['admin', 'staff_dewan']) && !$this->selectedOrganisasi) {
+            $orgQuery = \App\Models\Organisasi::where('is_active', true)
+                ->withCount('programKerja');
+                
+            if ($this->searchOrg) {
+                $orgQuery->where(function($q) {
+                    $q->where('nama', 'like', '%' . $this->searchOrg . '%')
+                      ->orWhere('singkatan', 'like', '%' . $this->searchOrg . '%');
+                });
+            }
+
+            $organisasis = $orgQuery->orderBy('tipe')->orderBy('nama')->get();
+        } else {
+            $query = ProgramKerja::query();
+            
+            $query->where('organisasi_id', $this->selectedOrganisasi);
+
+            if ($this->search) {
+                $query->where(function ($q) {
+                    $q->where('nama', 'like', '%' . $this->search . '%')
+                      ->orWhere('kategori', 'like', '%' . $this->search . '%');
+                });
+            }
+
+            $prokers = $query->with('organisasi')->latest()->paginate(10);
         }
-
-        $query->where(function ($q) {
-            $q->where('nama', 'like', '%' . $this->search . '%')
-              ->orWhere('kategori', 'like', '%' . $this->search . '%')
-              ->orWhereHas('organisasi', function($q2) {
-                  $q2->where('nama', 'like', '%' . $this->search . '%')
-                     ->orWhere('singkatan', 'like', '%' . $this->search . '%');
-              });
-        });
-
-        $prokers = $query->with('organisasi')->latest()->paginate(10);
         
-        $organisasis = \App\Models\Organisasi::all();
+        $allOrganisasis = \App\Models\Organisasi::where('is_active', true)->get();
 
-        return view('livewire.organisasi.kelola-proker', compact('prokers', 'organisasis'));
+        return view('livewire.organisasi.kelola-proker', compact('prokers', 'organisasis', 'allOrganisasis'));
     }
 
     public function create()
     {
         $this->resetFields();
-        // Set default organisasi if not admin/staff
-        if (!auth()->user()->hasRole(['admin', 'staff_dewan'])) {
-            $this->organisasi_id = auth()->user()->organisasi_id;
-        }
+        $this->organisasi_id = $this->selectedOrganisasi;
         $this->isModalOpen = true;
     }
 
@@ -113,15 +155,12 @@ class KelolaProker extends Component
             'status' => 'required|in:rencana,berjalan,selesai,dibatalkan',
             'kategori' => 'required|in:akademik,sosial,olahraga,seni,lainnya',
             'kategori_lainnya' => 'required_if:kategori,lainnya|nullable|string|max:255',
+            'organisasi_id' => 'required|exists:organisasi,id',
         ];
-        
-        if ($user->hasRole(['admin', 'staff_dewan'])) {
-            $rules['organisasi_id'] = 'required|exists:organisasi,id';
-        }
 
         $this->validate($rules);
         
-        $org_id = $user->hasRole(['admin', 'staff_dewan']) ? $this->organisasi_id : $user->organisasi_id;
+        $org_id = $this->organisasi_id;
 
         ProgramKerja::updateOrCreate(
             ['id' => $this->proker_id],
