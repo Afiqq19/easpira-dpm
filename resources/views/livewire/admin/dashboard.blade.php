@@ -73,7 +73,7 @@
     <!-- Charts & Proker Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Main Line Chart (2 Cols) -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 lg:col-span-2 min-w-0 overflow-hidden flex flex-col justify-between">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 lg:col-span-2 min-w-0 overflow-hidden flex flex-col h-fit">
             <!-- Header with Title & Custom Modern Legend Pills -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                 <div>

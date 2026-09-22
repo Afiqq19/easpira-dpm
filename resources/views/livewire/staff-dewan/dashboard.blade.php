@@ -71,7 +71,7 @@
     <!-- Charts & Proker Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <!-- Main Line Chart (2 Cols) -->
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 lg:col-span-2 min-w-0 overflow-hidden flex flex-col justify-between">
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 lg:col-span-2 min-w-0 overflow-hidden flex flex-col h-fit">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div>
                     <div class="flex items-center gap-2">

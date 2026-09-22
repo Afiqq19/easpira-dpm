@@ -47,7 +47,7 @@ class Dashboard extends Component
         // 3. LEADERBOARD: Organisasi dengan Proker Terbanyak
         $leaderboard = Organisasi::withCount('programKerja')
             ->orderBy('program_kerja_count', 'desc')
-            ->take(5)
+            ->take(3)
             ->get();
 
         // 4. UPCOMING PROKERS
