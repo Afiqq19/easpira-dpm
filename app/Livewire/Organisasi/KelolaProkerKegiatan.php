@@ -118,8 +118,8 @@ class KelolaProkerKegiatan extends Component
         $this->proker_id = $proker->id;
         $this->nama = $proker->nama;
         $this->deskripsi = $proker->deskripsi;
-        $this->tanggal_mulai = $proker->tanggal_mulai;
-        $this->tanggal_selesai = $proker->tanggal_selesai;
+        $this->tanggal_mulai = $proker->tanggal_mulai ? $proker->tanggal_mulai->format('Y-m-d') : null;
+        $this->tanggal_selesai = $proker->tanggal_selesai ? $proker->tanggal_selesai->format('Y-m-d') : null;
         $this->status = $proker->status;
         $this->kategori = $proker->kategori;
         $this->kategori_lainnya = $proker->kategori_lainnya;
