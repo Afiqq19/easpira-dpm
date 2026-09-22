@@ -114,71 +114,81 @@
         </div>
     </div>
 
-    @script
     <script>
-        // Data Chart Evaluasi Line
-        const bulanList = @json($bulanList);
-        const evalChart = @json($evaluasiChart);
-        
-        const optionsEvaluasi = {
-            series: [{
-                name: 'Kritik & Saran',
-                data: evalChart.reverse()
-            }],
-            chart: {
-                height: 320,
-                type: 'bar',
-                fontFamily: 'Inter, sans-serif',
-                toolbar: { show: false },
-                borderRadius: 4,
-            },
-            colors: ['#4f46e5'], // Indigo 600
-            dataLabels: { enabled: false },
-            plotOptions: {
-                bar: {
+        document.addEventListener('livewire:navigated', () => {
+            if (typeof window.ApexCharts === 'undefined') return;
+
+            // Data Chart Evaluasi Line
+            const bulanList = @json($bulanList);
+            const evalChart = @json($evaluasiChart);
+            
+            const optionsEvaluasi = {
+                series: [{
+                    name: 'Kritik & Saran',
+                    data: evalChart.reverse()
+                }],
+                chart: {
+                    height: 320,
+                    type: 'bar',
+                    fontFamily: 'Inter, sans-serif',
+                    toolbar: { show: false },
                     borderRadius: 4,
-                    columnWidth: '40%',
-                }
-            },
-            xaxis: {
-                categories: bulanList.reverse(),
-                axisBorder: { show: false },
-                axisTicks: { show: false }
-            },
-            yaxis: {
-                labels: { formatter: (val) => { return Math.floor(val) } }
-            },
-        };
+                },
+                colors: ['#4f46e5'], // Indigo 600
+                dataLabels: { enabled: false },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        columnWidth: '40%',
+                    }
+                },
+                xaxis: {
+                    categories: bulanList.reverse(),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: {
+                    labels: { formatter: (val) => { return Math.floor(val) } }
+                },
+            };
 
-        const chartEval = new window.ApexCharts(document.querySelector("#chart-evaluasi"), optionsEvaluasi);
-        chartEval.render();
-
-        // Data Chart Aspek (Polar Area)
-        const aspekLabels = @json($aspekLabels);
-        const aspekData = @json($aspekChart);
-        
-        const optionsAspek = {
-            series: aspekData,
-            labels: aspekLabels,
-            chart: {
-                type: 'polarArea',
-                fontFamily: 'Inter, sans-serif',
-                height: 320
-            },
-            stroke: {
-                colors: ['#fff']
-            },
-            fill: {
-                opacity: 0.8
-            },
-            colors: ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#64748b'], // Sky, Emerald, Amber, Violet, Slate
-            legend: {
-                position: 'bottom'
+            const chartEvalEl = document.querySelector("#chart-evaluasi");
+            if (chartEvalEl) {
+                chartEvalEl.innerHTML = '';
+                const chartEval = new window.ApexCharts(chartEvalEl, optionsEvaluasi);
+                chartEval.render();
             }
-        };
 
-        const chartAspek = new window.ApexCharts(document.querySelector("#chart-aspek"), optionsAspek);
-        chartAspek.render();
+            // Data Chart Aspek (Polar Area)
+            const aspekLabels = @json($aspekLabels);
+            const aspekData = @json($aspekChart);
+            
+            const optionsAspek = {
+                series: aspekData,
+                labels: aspekLabels,
+                chart: {
+                    type: 'polarArea',
+                    fontFamily: 'Inter, sans-serif',
+                    height: 320
+                },
+                stroke: {
+                    colors: ['#fff']
+                },
+                fill: {
+                    opacity: 0.8
+                },
+                colors: ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#64748b'], // Sky, Emerald, Amber, Violet, Slate
+                legend: {
+                    position: 'bottom'
+                }
+            };
+
+            const chartAspekEl = document.querySelector("#chart-aspek");
+            if (chartAspekEl) {
+                chartAspekEl.innerHTML = '';
+                const chartAspek = new window.ApexCharts(chartAspekEl, optionsAspek);
+                chartAspek.render();
+            }
+        });
     </script>
-    @endscript
 </div>
