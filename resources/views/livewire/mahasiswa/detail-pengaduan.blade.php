@@ -161,12 +161,12 @@
                 <div class="glass p-6 md:p-8 rounded-3xl shadow-lg border border-white/60">
                     <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
-                        Tanggapan Staff DPM
+                        Tanggapan Resmi & Tindak Lanjut
                     </h3>
 
-                    @if($pengaduan->tanggapans->count() > 0)
+                    @if($pengaduan->tanggapansPublik->count() > 0)
                         <div class="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
-                            @foreach($pengaduan->tanggapans as $tanggapan)
+                            @foreach($pengaduan->tanggapansPublik as $tanggapan)
                                 <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                     <!-- Icon -->
                                     <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-indigo-100 text-indigo-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10">
@@ -190,7 +190,46 @@
                             <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
                                 <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                             </div>
-                            <p class="text-slate-500">Belum ada tanggapan dari Staff Dewan. Laporan Anda sedang dalam antrean pemeriksaan.</p>
+                            <p class="text-slate-500">Belum ada tanggapan resmi. Laporan Anda sedang dalam tahap antrean atau pemeriksaan.</p>
+                        </div>
+                    @endif
+
+                    <!-- Form Balas Tanggapan untuk Mahasiswa -->
+                    @if($pengaduan->status !== 'selesai' && $pengaduan->status !== 'ditolak')
+                        <div class="mt-8 pt-6 border-t border-slate-100">
+                            @if (session()->has('success_tanggapan'))
+                                <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-2xl flex items-center gap-3 text-xs font-bold shadow-sm mb-4">
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    {{ session('success_tanggapan') }}
+                                </div>
+                            @endif
+
+                            <form wire:submit="balasTanggapan" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Beri Balasan Tambahan / Tambah Bukti</label>
+                                    <textarea wire:model="isi_tanggapan" rows="3" class="w-full rounded-2xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-500 placeholder-slate-400" placeholder="Ketik balasan Anda ke Staff DPM di sini..."></textarea>
+                                    @error('isi_tanggapan') <span class="text-xs text-rose-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2">
+                                        <span wire:loading.remove wire:target="balasTanggapan" class="flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                            Kirim Balasan
+                                        </span>
+                                        <span wire:loading wire:target="balasTanggapan" class="flex items-center gap-2">
+                                            <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Mengirim...
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @else
+                        <div class="mt-8 pt-6 border-t border-slate-100">
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center gap-2 text-slate-500 text-sm font-medium">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                Laporan ini sudah ditutup (Status: {{ ucfirst($pengaduan->status) }}), Anda tidak dapat mengirim pesan lagi.
+                            </div>
                         </div>
                     @endif
                 </div>

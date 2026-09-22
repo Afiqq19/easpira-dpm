@@ -19,6 +19,7 @@ class DetailPengaduan extends Component
     public $ticket_code;
     public $pengaduan;
     public $isi_tanggapan;
+    public $is_internal = false;
     
     // Status update from detail
     public $status_baru;
@@ -112,7 +113,7 @@ class DetailPengaduan extends Component
             'pengaduan_id' => $this->pengaduan->id,
             'user_id' => Auth::id(),
             'isi_tanggapan' => $this->isi_tanggapan,
-            'is_internal' => false,
+            'is_internal' => $this->is_internal,
         ]);
 
         $this->catatLogSensitif('balas_tanggapan', $this->pengaduan, [

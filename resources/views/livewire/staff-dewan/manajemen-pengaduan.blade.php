@@ -99,17 +99,23 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                <select wire:change="updateStatus({{ $p->id }}, $event.target.value)" class="bg-transparent border-none text-sm font-semibold focus:ring-0 p-0 pr-6 {{ $p->status === 'selesai' ? 'text-emerald-600' : ($p->status === 'ditolak' ? 'text-rose-600' : 'text-indigo-600') }}">
-                                    <option value="diterima" {{ $p->status == 'diterima' ? 'selected' : '' }}>Diterima</option>
-                                    <option value="diverifikasi" {{ $p->status == 'diverifikasi' ? 'selected' : '' }}>Diverifikasi</option>
-                                    <option value="diproses" {{ $p->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                    <option value="ditindaklanjuti" {{ $p->status == 'ditindaklanjuti' ? 'selected' : '' }}>Ditindaklanjuti</option>
-                                    <option value="selesai" {{ $p->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                    <option value="ditolak" {{ $p->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                </select>
+                                @if(auth()->user()->isEksekutif())
+                                    <span class="text-sm font-semibold {{ $p->status === 'selesai' ? 'text-emerald-600' : ($p->status === 'ditolak' ? 'text-rose-600' : 'text-indigo-600') }}">
+                                        {{ $p->label_status }}
+                                    </span>
+                                @else
+                                    <select wire:change="updateStatus({{ $p->id }}, $event.target.value)" class="bg-transparent border-none text-sm font-semibold focus:ring-0 p-0 pr-6 {{ $p->status === 'selesai' ? 'text-emerald-600' : ($p->status === 'ditolak' ? 'text-rose-600' : 'text-indigo-600') }}">
+                                        <option value="diterima" {{ $p->status == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                                        <option value="diverifikasi" {{ $p->status == 'diverifikasi' ? 'selected' : '' }}>Diverifikasi</option>
+                                        <option value="diproses" {{ $p->status == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                                        <option value="ditindaklanjuti" {{ $p->status == 'ditindaklanjuti' ? 'selected' : '' }}>Ditindaklanjuti</option>
+                                        <option value="selesai" {{ $p->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        <option value="ditolak" {{ $p->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                    </select>
+                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ Auth::user()->hasRole('admin') ? route('admin.pengaduan.detail', $p->ticket_code) : route('dewan.pengaduan.detail', $p->ticket_code) }}" wire:navigate class="inline-block text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                                <a href="{{ Auth::user()->hasRole('admin') ? route('admin.pengaduan.detail', $p->ticket_code) : (Auth::user()->isEksekutif() ? route('eksekutif.pengaduan.detail', $p->ticket_code) : route('dewan.pengaduan.detail', $p->ticket_code)) }}" wire:navigate class="inline-block text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
                                     Lihat Detail
                                 </a>
                             </td>

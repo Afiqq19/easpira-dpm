@@ -56,6 +56,7 @@
                 </div>
                 
                 <!-- Quick Status Selector Dropdown -->
+                @if(!auth()->user()->isEksekutif())
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-bold text-slate-500 whitespace-nowrap hidden sm:inline">Ubah Status:</label>
                     <select wire:model.live="status_baru" class="rounded-xl border-slate-300 text-xs font-bold text-slate-700 bg-white shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-1.5 pl-3 pr-8">
@@ -70,6 +71,7 @@
                         <svg fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     </div>
                 </div>
+                @endif
             </div>
             
             @if($pengaduan->status === 'ditolak')
@@ -237,10 +239,13 @@
                                 <div class="w-8 h-8 rounded-full flex-shrink-0 {{ $tanggapan->user_id === Auth::id() ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600' }} flex items-center justify-center font-bold text-xs">
                                     {{ substr($tanggapan->user->nama ?? 'A', 0, 1) }}
                                 </div>
-                                <div class="max-w-[80%] rounded-2xl p-4 {{ $tanggapan->user_id === Auth::id() ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-tl-none' }}">
+                                <div class="max-w-[80%] rounded-2xl p-4 {{ $tanggapan->is_internal ? 'bg-amber-50 border border-amber-200 text-amber-900 rounded-tr-none' : ($tanggapan->user_id === Auth::id() ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-slate-100 text-slate-800 rounded-tl-none') }}">
                                     <div class="flex items-center justify-between gap-4 mb-1">
-                                        <span class="text-xs font-bold {{ $tanggapan->user_id === Auth::id() ? 'text-indigo-100' : 'text-slate-600' }}">{{ $tanggapan->user->nama ?? 'Staff' }}</span>
-                                        <span class="text-[10px] {{ $tanggapan->user_id === Auth::id() ? 'text-indigo-200' : 'text-slate-400' }}">{{ $tanggapan->created_at->translatedFormat('H:i') }}</span>
+                                        <span class="text-xs font-bold {{ $tanggapan->is_internal ? 'text-amber-800' : ($tanggapan->user_id === Auth::id() ? 'text-indigo-100' : 'text-slate-600') }}">{{ $tanggapan->user->nama ?? 'Staff' }}</span>
+                                        @if($tanggapan->is_internal)
+                                            <span class="text-[10px] font-bold bg-amber-200 text-amber-800 px-1.5 py-0.5 rounded uppercase">Internal</span>
+                                        @endif
+                                        <span class="text-[10px] {{ $tanggapan->is_internal ? 'text-amber-600' : ($tanggapan->user_id === Auth::id() ? 'text-indigo-200' : 'text-slate-400') }}">{{ $tanggapan->created_at->translatedFormat('H:i') }}</span>
                                     </div>
                                     <p class="text-sm">{{ $tanggapan->isi_tanggapan }}</p>
                                 </div>
@@ -261,6 +266,11 @@
                         <div>
                             <textarea wire:model="isi_tanggapan" rows="3" class="w-full rounded-2xl border-slate-200 text-sm focus:border-indigo-500 focus:ring-indigo-500 placeholder-slate-400" placeholder="Tuliskan tanggapan resmi dari dewan..."></textarea>
                             @error('isi_tanggapan') <span class="text-xs text-rose-500">{{ $message }}</span> @enderror
+                            
+                            <div class="flex items-center mt-3">
+                                <input type="checkbox" wire:model="is_internal" id="is_internal" class="rounded text-indigo-600 focus:ring-indigo-500 mr-2 border-slate-300">
+                                <label for="is_internal" class="text-sm text-slate-600 font-medium cursor-pointer">Tandai sebagai Catatan Internal (Hanya dilihat oleh Staff/Pimpinan, tidak akan masuk ke pelapor)</label>
+                            </div>
                         </div>
                         <div class="flex justify-end">
                             <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all">

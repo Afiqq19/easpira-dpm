@@ -18,7 +18,7 @@ class DetailPengaduan extends Component
         $this->ticket_code = $ticket_code;
         
         // Cari pengaduan milik user yang login
-        $this->pengaduan = Pengaduan::with(['kategori', 'tanggapans.user'])
+        $this->pengaduan = Pengaduan::with(['kategori', 'tanggapansPublik.user'])
             ->where('ticket_code', $ticket_code)
             ->where(function($query) {
                 // Pastikan hanya bisa dilihat oleh si pembuat laporan
@@ -29,6 +29,31 @@ class DetailPengaduan extends Component
                       ->orWhereNull('user_id');
             })
             ->firstOrFail();
+    }
+
+    public $isi_tanggapan;
+
+    public function balasTanggapan()
+    {
+        $this->validate([
+            'isi_tanggapan' => 'required|string|min:5',
+        ], [
+            'isi_tanggapan.required' => 'Tanggapan tidak boleh kosong.',
+            'isi_tanggapan.min' => 'Tanggapan minimal 5 karakter.',
+        ]);
+
+        \App\Models\TanggapanPengaduan::create([
+            'pengaduan_id' => $this->pengaduan->id,
+            'user_id' => Auth::id(), // null jika guest, tapi pelapor sudah login
+            'isi_tanggapan' => $this->isi_tanggapan,
+            'is_internal' => false, // Mahasiswa tidak bisa bikin internal
+        ]);
+
+        // Refresh tanggapan
+        $this->pengaduan->refresh();
+        $this->isi_tanggapan = '';
+        
+        session()->flash('success_tanggapan', 'Tanggapan Anda berhasil dikirim!');
     }
 
     public function render()

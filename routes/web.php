@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $user = \Illuminate\Support\Facades\Auth::user();
         if ($user->hasRole('admin')) return redirect()->route('admin.dashboard');
         if ($user->hasRole('staff_dewan')) return redirect()->route('dewan.dashboard');
+        if ($user->isEksekutif()) return redirect()->route('eksekutif.dashboard');
         if ($user->hasRole('hmps') || $user->hasRole('ukm')) return redirect()->route('organisasi.dashboard');
         return redirect()->route('mahasiswa.dashboard');
     })->name('dashboard.redirect');
@@ -66,6 +67,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');
         // Kelola UU Kema
         Route::get('uu-kema', \App\Livewire\Admin\KelolaUuKema::class)->name('uu-kema.index');
+    });
+
+    // EKSEKUTIF ROUTES (Direktur & Wakil Direktur)
+    Route::middleware('check.role:direktur,wakil_direktur')->prefix('eksekutif')->name('eksekutif.')->group(function () {
+        Route::get('dashboard', \App\Livewire\Eksekutif\Dashboard::class)->name('dashboard');
+        // Manajemen Pengaduan (Read Only & Catatan Internal)
+        Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
+        Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
     });
 
     // 2. STAFF DEWAN ROUTES
@@ -158,6 +167,7 @@ Route::get('/update-rahasia-dpm', function () {
     $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
       $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
       $output_katseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=KategoriPengaduanSeeder --force 2>&1");
+      $output_dbseed = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=DatabaseSeeder --force 2>&1");
     $output_clear = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
     

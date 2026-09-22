@@ -100,6 +100,32 @@ class DatabaseSeeder extends Seeder
         );
         $staff->assignRole('staff_dewan');
 
+        // 5.1 Buat akun Direktur
+        $direktur = User::firstOrCreate(
+            ['username' => 'direktur'],
+            [
+                'nama'        => 'Direktur Utama',
+                'name'        => 'Direktur Utama',
+                'email'       => 'direktur@polmed.ac.id',
+                'password'    => Hash::make('password123'),
+                'is_active'   => true,
+            ],
+        );
+        $direktur->assignRole('direktur');
+
+        // 5.2 Buat akun Wakil Direktur
+        $wakilDirektur = User::firstOrCreate(
+            ['username' => 'wakildirektur'],
+            [
+                'nama'        => 'Wakil Direktur',
+                'name'        => 'Wakil Direktur',
+                'email'       => 'wadir@polmed.ac.id',
+                'password'    => Hash::make('password123'),
+                'is_active'   => true,
+            ],
+        );
+        $wakilDirektur->assignRole('wakil_direktur');
+
         // 6. Buat akun HMPS — Teknik Elektro
         $hmpsTeAkun = User::firstOrCreate(
             ['username' => 'hmte'],
@@ -209,6 +235,10 @@ class DatabaseSeeder extends Seeder
         $this->command->info('');
         $this->command->info('  [STAFF DEWAN]');
         $this->command->info('  Username : staffdewan        | Password: password123');
+        $this->command->info('');
+        $this->command->info('  [PIMPINAN EKSEKUTIF]');
+        $this->command->info('  Username : direktur          | Password: password123');
+        $this->command->info('  Username : wakildirektur     | Password: password123');
         $this->command->info('');
         $this->command->info('  [HMPS]');
         $this->command->info('  Username : hmte              | Password: password123');

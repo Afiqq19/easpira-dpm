@@ -147,6 +147,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Cek apakah user adalah Direktur
+     */
+    public function isDirektur(): bool
+    {
+        return $this->hasRole('direktur');
+    }
+
+    /**
+     * Cek apakah user adalah Wakil Direktur
+     */
+    public function isWakilDirektur(): bool
+    {
+        return $this->hasRole('wakil_direktur');
+    }
+
+    /**
+     * Cek apakah user adalah pimpinan eksekutif
+     */
+    public function isEksekutif(): bool
+    {
+        return $this->hasAnyRole(['direktur', 'wakil_direktur']);
+    }
+
+    /**
      * Scope untuk user aktif
      */
     public function scopeAktif($query)

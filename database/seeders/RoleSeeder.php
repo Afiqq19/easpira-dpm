@@ -159,7 +159,25 @@ class RoleSeeder extends Seeder
             // (dikontrol via Policy, bukan permission langsung)
         ]);
 
-        $this->command->info('✅ 5 roles dibuat: admin, staff_dewan, hmps, ukm, mahasiswa');
+        // 6. DIREKTUR — Pimpinan Eksekutif
+        $direktur = Role::firstOrCreate(['name' => 'direktur', 'guard_name' => 'web']);
+        $direktur->syncPermissions([
+            'lihat_pengaduan_umum',
+            'lihat_pengaduan_sensitif',
+            'lihat_user',
+            'lihat_log_aktivitas',
+        ]);
+
+        // 7. WAKIL DIREKTUR — Pimpinan Eksekutif
+        $wakilDirektur = Role::firstOrCreate(['name' => 'wakil_direktur', 'guard_name' => 'web']);
+        $wakilDirektur->syncPermissions([
+            'lihat_pengaduan_umum',
+            'lihat_pengaduan_sensitif',
+            'lihat_user',
+            'lihat_log_aktivitas',
+        ]);
+
+        $this->command->info('✅ 7 roles dibuat: admin, staff_dewan, hmps, ukm, mahasiswa, direktur, wakil_direktur');
         $this->command->warn('⚠️  Permission "penanganan_kasus_sensitif" harus di-assign manual ke staff yang ditunjuk!');
     }
 }
