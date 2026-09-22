@@ -71,33 +71,29 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                                 @endif
                             </div>
-                            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                                <span class="text-slate-400">e-Aspira</span>
-                                <span>/</span>
-                                <span class="font-bold text-slate-800 text-sm tracking-tight">
-                                    @if(request()->routeIs('*dashboard*'))
-                                        Dashboard
-                                    @elseif(request()->routeIs('*proker*'))
-                                        Pantau Proker
-                                    @elseif(request()->routeIs('*pengaduan*'))
-                                        Pantau Pengaduan
-                                    @elseif(request()->routeIs('*users*'))
-                                        Manajemen User
-                                    @elseif(request()->routeIs('*pengumuman*'))
-                                        Pengumuman
-                                    @elseif(request()->routeIs('*evaluasi*'))
-                                        Evaluasi Proker
-                                    @elseif(request()->routeIs('*uu-kema*'))
-                                        UU Kema
-                                    @elseif(request()->routeIs('*log*'))
-                                        Log Aktivitas
-                                    @elseif(request()->routeIs('*profile*'))
-                                        Profil Saya
-                                    @else
-                                        {{ isset($header) ? $header : 'Dashboard' }}
-                                    @endif
-                                </span>
-                            </div>
+                            <span class="font-extrabold text-slate-800 text-sm tracking-wider uppercase">
+                                @if(request()->routeIs('*dashboard*'))
+                                    DASHBOARD
+                                @elseif(request()->routeIs('*proker*'))
+                                    PANTAU PROKER
+                                @elseif(request()->routeIs('*pengaduan*'))
+                                    PANTAU PENGADUAN
+                                @elseif(request()->routeIs('*users*'))
+                                    MANAJEMEN USER
+                                @elseif(request()->routeIs('*pengumuman*'))
+                                    PENGUMUMAN
+                                @elseif(request()->routeIs('*evaluasi*'))
+                                    EVALUASI PROKER
+                                @elseif(request()->routeIs('*uu-kema*'))
+                                    UU KEMA
+                                @elseif(request()->routeIs('*log*'))
+                                    LOG AKTIVITAS
+                                @elseif(request()->routeIs('*profile*'))
+                                    PROFIL SAYA
+                                @else
+                                    {{ isset($header) ? strtoupper($header) : 'DASHBOARD' }}
+                                @endif
+                            </span>
                         </div>
 
                     </div>
