@@ -33,7 +33,7 @@ class UserManagement extends Component
 
     public function mount()
     {
-        $this->rolesList = Role::whereNotIn('name', ['admin'])->get();
+        $this->rolesList = Role::whereNotIn('name', ['admin', 'direktur', 'wakil_direktur'])->get();
         $this->organisasiList = Organisasi::active()->get();
     }
 
@@ -81,6 +81,11 @@ class UserManagement extends Component
     {
         $this->resetFields();
         $user = User::findOrFail($id);
+        
+        if ($user->hasRole('admin') || $user->hasRole('direktur') || $user->hasRole('wakil_direktur')) {
+            session()->flash('error', 'Tidak dapat mengedit akun Admin atau Eksekutif.');
+            return;
+        }
         
         $this->user_id = $user->id;
         $this->nama = $user->nama;
@@ -152,8 +157,8 @@ class UserManagement extends Component
     {
         $this->userToDelete = User::findOrFail($id);
         
-        if ($this->userToDelete->hasRole('admin')) {
-            session()->flash('error', 'Tidak dapat menghapus akun Admin.');
+        if ($this->userToDelete->hasRole('admin') || $this->userToDelete->hasRole('direktur') || $this->userToDelete->hasRole('wakil_direktur')) {
+            session()->flash('error', 'Tidak dapat menghapus akun Admin atau Eksekutif.');
             return;
         }
         
@@ -173,8 +178,8 @@ class UserManagement extends Component
     {
         $user = User::findOrFail($id);
         
-        if ($user->hasRole('admin')) {
-            session()->flash('error', 'Tidak dapat menonaktifkan akun Admin.');
+        if ($user->hasRole('admin') || $user->hasRole('direktur') || $user->hasRole('wakil_direktur')) {
+            session()->flash('error', 'Tidak dapat menonaktifkan akun Admin atau Eksekutif.');
             return;
         }
         
