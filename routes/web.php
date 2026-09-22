@@ -31,16 +31,6 @@ Route::get('/kebijakan-privasi', \App\Livewire\Publik\KebijakanPrivasi::class)->
 Route::get('auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirect'])->name('google.login');
 Route::get('auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'callback']);
 
-Route::get('/login-sebagai-mahasiswa', function () {
-    $user = \App\Models\User::where('nama', 'like', '%Syafiq%')->first() 
-            ?: \App\Models\User::role('mahasiswa')->first();
-    if ($user) {
-        \Illuminate\Support\Facades\Auth::login($user);
-        return redirect()->route('mahasiswa.pengaduan.index');
-    }
-    return 'User mahasiswa tidak ditemukan.';
-});
-
 // =====================================================================
 // RUTE SETELAH LOGIN (Terlindungi Auth)
 // =====================================================================
