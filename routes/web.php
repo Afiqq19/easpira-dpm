@@ -163,6 +163,7 @@ Route::get('/update-rahasia-dpm', function () {
     $output2 = shell_exec("cd \"$repoDir\" && git reset --hard origin/main 2>&1");
     
     // Pakai --no-interaction agar composer tidak nyangkut minta konfirmasi
+    putenv('COMPOSER_HOME=/tmp');
     $output3 = shell_exec("cd \"$repoDir\" && composer install --no-interaction --prefer-dist --optimize-autoloader 2>&1");
     $output4 = shell_exec("cd \"$repoDir\" && php artisan migrate --force 2>&1");
       $output_roles = shell_exec("cd \"$repoDir\" && php artisan db:seed --class=RoleSeeder --force 2>&1");
@@ -185,8 +186,11 @@ Route::get('/update-rahasia-dpm', function () {
 [COMPOSER INSTALL]
 " . htmlspecialchars((string) $output3) . "
 
-[DATABASE MIGRATE]
+[DATABASE MIGRATE & SEED]
 " . htmlspecialchars((string) $output4) . "
+" . htmlspecialchars((string) $output_roles) . "
+" . htmlspecialchars((string) $output_katseed) . "
+" . htmlspecialchars((string) $output_dbseed) . "
 
 [CLEAR CACHE & STORAGE LINK]
 " . htmlspecialchars((string) $output_clear) . "
