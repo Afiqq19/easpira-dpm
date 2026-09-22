@@ -64,10 +64,10 @@ new class extends Component
         <div>
             <h3 class="text-base font-bold text-slate-800">Biodata & Informasi Akun</h3>
             <p class="text-xs text-slate-500 mt-0.5">
-                @if($isStaffOrAdmin)
-                    Perbarui nama lengkap dan informasi akun Anda.
-                @else
+                @if($isMahasiswa)
                     Perbarui nama lengkap, NIM, dan program studi Anda.
+                @else
+                    Perbarui nama lengkap dan informasi akun Anda.
                 @endif
             </p>
         </div>
