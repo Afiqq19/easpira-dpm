@@ -25,9 +25,10 @@ class DaftarProker extends Component
 
     public function render()
     {
-        // Ambil proker yang aktif, urutkan dari yang terbaru, batasi 6 saja untuk landing page
+        // Ambil proker yang aktif dan belum selesai, urutkan dari yang terbaru, batasi 6 saja untuk landing page
         $prokers = ProgramKerja::with('organisasi')
                     ->where('is_active', true)
+                    ->where('status', '!=', 'selesai')
                     ->when($this->filterTipe, function($q) {
                         $q->whereHas('organisasi', function($q2) {
                             $q2->where('tipe', $this->filterTipe)

@@ -10,7 +10,7 @@ class DaftarKegiatan extends Component
 {
     use WithPagination;
 
-    public $filter = 'semua'; // semua, akan_datang, selesai
+    public $filter = 'akan_datang'; // semua, akan_datang, selesai
 
     public function render()
     {
