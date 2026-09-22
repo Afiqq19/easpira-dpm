@@ -21,6 +21,7 @@ class Kegiatan extends Model
         'tanggal_selesai',
         'lokasi',
         'organisasi_id',
+        'program_kerja_id',
         'user_id',
         'poster',
         'kontak_penanggung_jawab',
@@ -49,6 +50,11 @@ class Kegiatan extends Model
     // =====================================================================
     // RELASI
     // =====================================================================
+
+    public function programKerja()
+    {
+        return $this->belongsTo(ProgramKerja::class);
+    }
 
     public function organisasi()
     {

@@ -64,10 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
         // Pantau Evaluasi Proker
         Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
-        // Kelola Proker (Read Only)
-        Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
-        // Kelola Kegiatan
-        Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');
+        // Kelola Proker & Kegiatan (Unified)
+        Route::get('proker-kegiatan', \App\Livewire\Organisasi\KelolaProkerKegiatan::class)->name('proker-kegiatan.index');
+        // Kelola Periode
+        Route::get('periode', \App\Livewire\Admin\KelolaPeriode::class)->name('periode.index');
         // Kelola UU Kema
         Route::get('uu-kema', \App\Livewire\Admin\KelolaUuKema::class)->name('uu-kema.index');
     });
@@ -99,11 +99,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Pantau Evaluasi Proker
         Route::get('evaluasi-proker', \App\Livewire\StaffDewan\PantauEvaluasi::class)->name('evaluasi-proker.index');
         
-        // Kelola Proker (Read-Only)
-        Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
-        
-        // Kelola Kegiatan
-        Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');
+        // Kelola Proker & Kegiatan (Unified)
+        Route::get('proker-kegiatan', \App\Livewire\Organisasi\KelolaProkerKegiatan::class)->name('proker-kegiatan.index');
 
         // Beri Evaluasi ke BEM (Staff Dewan bisa ikut memberi evaluasi)
         Route::get('evaluasi-bem', \App\Livewire\Mahasiswa\EvaluasiProker::class)->name('evaluasi-bem.index');
@@ -118,11 +115,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Manajemen Pengumuman Organisasi
         Route::get('pengumuman', \App\Livewire\Organisasi\KelolaPengumuman::class)->name('pengumuman.index');
         
-        // Manajemen Kegiatan Organisasi
-        Route::get('kegiatan', \App\Livewire\Organisasi\KelolaKegiatan::class)->name('kegiatan.index');
-
-        // Manajemen Program Kerja
-        Route::get('proker', \App\Livewire\Organisasi\KelolaProker::class)->name('proker.index');
+        // Manajemen Program Kerja & Kegiatan (Unified)
+        Route::get('proker-kegiatan', \App\Livewire\Organisasi\KelolaProkerKegiatan::class)->name('proker-kegiatan.index');
 
         // Berikan Evaluasi ke BEM
         Route::get('evaluasi-bem', \App\Livewire\Mahasiswa\EvaluasiProker::class)->name('evaluasi-bem.index');

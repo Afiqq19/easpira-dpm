@@ -26,6 +26,14 @@
                 </div>
             </div>
         </div>
+        <div class="flex items-center gap-3">
+            <select wire:model.live="periode_id" class="px-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                <option value="">-- Pilih Periode --</option>
+                @foreach($periodes as $periode)
+                    <option value="{{ $periode->id }}">{{ $periode->nama }} {{ $periode->is_active ? '(Aktif)' : '' }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     @if(!$selectedOrganisasi)

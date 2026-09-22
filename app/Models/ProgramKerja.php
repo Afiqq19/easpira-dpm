@@ -17,6 +17,7 @@ class ProgramKerja extends Model
         'deskripsi',
         'organisasi_id',
         'user_id',
+        'periode_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'status',
@@ -30,6 +31,16 @@ class ProgramKerja extends Model
         'tanggal_selesai' => 'date',
         'is_active' => 'boolean',
     ];
+
+    public function periode()
+    {
+        return $this->belongsTo(Periode::class);
+    }
+
+    public function kegiatan()
+    {
+        return $this->hasMany(Kegiatan::class);
+    }
 
     public function organisasi()
     {

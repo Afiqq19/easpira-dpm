@@ -18,6 +18,20 @@ class PantauProker extends Component
     public $selectedOrganisasi = null;
     public $selectedOrganisasiNama = '';
     public $statusFilter = '';
+    public $periode_id = null;
+
+    public function mount()
+    {
+        $activePeriode = \App\Models\Periode::where('is_active', true)->first();
+        if ($activePeriode) {
+            $this->periode_id = $activePeriode->id;
+        } else {
+            $firstPeriode = \App\Models\Periode::latest()->first();
+            if ($firstPeriode) {
+                $this->periode_id = $firstPeriode->id;
+            }
+        }
+    }
 
     public function updatingSearch()
     {
@@ -30,6 +44,11 @@ class PantauProker extends Component
     }
 
     public function updatingStatusFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPeriodeId()
     {
         $this->resetPage();
     }
@@ -55,7 +74,11 @@ class PantauProker extends Component
     {
         // Daftar organisasi
         $orgQuery = Organisasi::where('is_active', true)
-            ->withCount('programKerja');
+            ->withCount(['programKerja' => function($q) {
+                if ($this->periode_id) {
+                    $q->where('periode_id', $this->periode_id);
+                }
+            }]);
             
         if ($this->searchOrg) {
             $orgQuery->where(function($q) {
@@ -72,7 +95,11 @@ class PantauProker extends Component
 
         if ($this->selectedOrganisasi) {
             $query = ProgramKerja::where('organisasi_id', $this->selectedOrganisasi)
-                ->with('organisasi');
+                ->with('organisasi', 'kegiatan');
+
+            if ($this->periode_id) {
+                $query->where('periode_id', $this->periode_id);
+            }
 
             if ($this->search) {
                 $query->where('nama', 'like', '%' . $this->search . '%');
@@ -85,6 +112,8 @@ class PantauProker extends Component
             $prokers = $query->latest()->paginate(10);
         }
 
-        return view('livewire.eksekutif.pantau-proker', compact('organisasis', 'prokers'));
+        $periodes = \App\Models\Periode::orderBy('id', 'desc')->get();
+
+        return view('livewire.eksekutif.pantau-proker', compact('organisasis', 'prokers', 'periodes'));
     }
 }
