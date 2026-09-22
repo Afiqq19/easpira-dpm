@@ -240,7 +240,7 @@
                     yaxis: { lines: { show: true } },
                     padding: {
                         top: 5,
-                        right: 35,
+                        right: 25,
                         bottom: 0,
                         left: 15
                     }
@@ -248,14 +248,11 @@
                 xaxis: {
                     type: 'category',
                     categories: bulanShort,
-                    tickAmount: 5,
                     tickPlacement: 'on',
-                    hideOverlappingLabels: false,
                     axisBorder: { show: false },
                     axisTicks: { show: false },
                     labels: {
                         rotate: 0,
-                        hideOverlappingLabels: false,
                         trim: false,
                         style: {
                             colors: '#94a3b8',
@@ -306,26 +303,20 @@
 
             function renderChart() {
                 if (typeof window.ApexCharts === 'undefined') return;
-                el.innerHTML = '';
 
-                var rect = el.getBoundingClientRect();
-                if (rect.width > 0) {
-                    optionsPengaduan.chart.width = Math.floor(rect.width);
-                }
-
-                var chart = new window.ApexCharts(el, optionsPengaduan);
-                chart.render();
-                el.dataset.rendered = 'true';
-
-                window.addEventListener('resize', function() {
-                    if (chart && el && el.parentElement) {
-                        var newWidth = el.parentElement.clientWidth;
-                        if (newWidth > 0) {
-                            chart.updateOptions({
-                                chart: { width: newWidth }
-                            });
-                        }
+                requestAnimationFrame(function() {
+                    el.innerHTML = '';
+                    var w = Math.floor(el.clientWidth || el.getBoundingClientRect().width);
+                    if (w > 0) {
+                        optionsPengaduan.chart.width = w;
                     }
+
+                    if (window.__chartPengaduan) {
+                        try { window.__chartPengaduan.destroy(); } catch(e) {}
+                    }
+                    window.__chartPengaduan = new window.ApexCharts(el, optionsPengaduan);
+                    window.__chartPengaduan.render();
+                    el.dataset.rendered = 'true';
                 });
             }
 
@@ -336,6 +327,19 @@
                 s.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
                 s.onload = renderChart;
                 document.head.appendChild(s);
+            }
+
+            if (window.ResizeObserver && el.parentElement) {
+                var ro = new ResizeObserver(function(entries) {
+                    for (var i = 0; i < entries.length; i++) {
+                        var newW = Math.floor(entries[i].contentRect.width);
+                        if (newW > 0 && window.__chartPengaduan && Math.abs(newW - (optionsPengaduan.chart.width || 0)) > 5) {
+                            optionsPengaduan.chart.width = newW;
+                            window.__chartPengaduan.updateOptions({ chart: { width: newW } });
+                        }
+                    }
+                });
+                ro.observe(el.parentElement);
             }
         });
 
