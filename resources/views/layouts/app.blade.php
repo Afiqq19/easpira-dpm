@@ -90,6 +90,8 @@
                                     LOG AKTIVITAS
                                 @elseif(request()->routeIs('*profile*'))
                                     PROFIL SAYA
+                                @elseif(request()->routeIs('*organisasi*'))
+                                    MASTER DATA ORGANISASI
                                 @elseif(isset($header))
                                     {{ $header }}
                                 @else

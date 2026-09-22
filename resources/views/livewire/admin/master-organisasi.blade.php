@@ -1,8 +1,4 @@
 <div>
-    <x-slot name="header">
-        Master Data Organisasi
-    </x-slot>
-
     <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-800">Master Data Organisasi</h1>

@@ -21,6 +21,7 @@ class Organisasi extends Model
         'deskripsi',
         'logo',
         'is_active',
+        'active_periode_id',
     ];
 
     protected $casts = [
