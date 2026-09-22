@@ -53,8 +53,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 1. ADMIN ROUTES
     Route::middleware('check.role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', \App\Livewire\Admin\Dashboard::class)->name('dashboard');
-        // Manajemen User (Livewire)
+        // Manajemen User (Master Data User)
         Route::get('users', \App\Livewire\Admin\UserManagement::class)->name('users');
+        // Manajemen Organisasi (Master Data Organisasi)
+        Route::get('organisasi', \App\Livewire\Admin\MasterOrganisasi::class)->name('organisasi.index');
         // Manajemen Pengumuman
         Route::get('pengumuman', \App\Livewire\Admin\KelolaPengumuman::class)->name('pengumuman.index');
         // Log Aktivitas
