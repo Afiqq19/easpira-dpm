@@ -25,6 +25,15 @@ class MasterOrganisasi extends Component
     public $tipe = 'HMPS';
     public $deskripsi;
     public $is_active = true;
+    public $active_periode_id = null;
+
+    public function mount()
+    {
+        $firstPeriode = \App\Models\Periode::latest('id')->first();
+        if ($firstPeriode) {
+            $this->active_periode_id = $firstPeriode->id;
+        }
+    }
 
     public function updatingSearch()
     {
@@ -48,6 +57,7 @@ class MasterOrganisasi extends Component
         $this->tipe = $org->tipe;
         $this->deskripsi = $org->deskripsi;
         $this->is_active = $org->is_active;
+        $this->active_periode_id = $org->active_periode_id;
 
         $this->isOpen = true;
     }
@@ -60,6 +70,7 @@ class MasterOrganisasi extends Component
             'tipe' => 'required|in:HMPS,UKM,DPM',
             'deskripsi' => 'nullable|string',
             'is_active' => 'boolean',
+            'active_periode_id' => 'nullable|exists:periodes,id',
         ]);
 
         Organisasi::updateOrCreate(
@@ -70,6 +81,7 @@ class MasterOrganisasi extends Component
                 'tipe' => $this->tipe,
                 'deskripsi' => $this->deskripsi,
                 'is_active' => $this->is_active,
+                'active_periode_id' => $this->active_periode_id,
             ]
         );
 
@@ -100,6 +112,14 @@ class MasterOrganisasi extends Component
         $this->tipe = 'HMPS';
         $this->deskripsi = '';
         $this->is_active = true;
+        
+        $firstPeriode = \App\Models\Periode::latest('id')->first();
+        if ($firstPeriode) {
+            $this->active_periode_id = $firstPeriode->id;
+        } else {
+            $this->active_periode_id = null;
+        }
+
         $this->resetErrorBag();
     }
 
@@ -110,7 +130,9 @@ class MasterOrganisasi extends Component
             ->orderBy('tipe')
             ->orderBy('nama')
             ->paginate(10);
+            
+        $periodes = \App\Models\Periode::orderBy('id', 'desc')->get();
 
-        return view('livewire.admin.master-organisasi', compact('organisasis'));
+        return view('livewire.admin.master-organisasi', compact('organisasis', 'periodes'));
     }
 }

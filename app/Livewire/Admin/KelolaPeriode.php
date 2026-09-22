@@ -76,16 +76,6 @@ class KelolaPeriode extends Component
         session()->flash('message', $this->periode_id ? 'Periode berhasil diperbarui.' : 'Periode berhasil ditambahkan.');
     }
 
-    public function setActive($id)
-    {
-        // Nonaktifkan semua
-        Periode::query()->update(['is_active' => false]);
-        // Aktifkan yang dipilih
-        Periode::findOrFail($id)->update(['is_active' => true]);
-        
-        session()->flash('message', 'Periode aktif berhasil diubah.');
-    }
-
     public function confirmDelete($id)
     {
         $this->periodeToDelete = Periode::findOrFail($id);
@@ -95,13 +85,8 @@ class KelolaPeriode extends Component
     public function delete()
     {
         if ($this->periodeToDelete) {
-            // Cek jika sedang aktif
-            if ($this->periodeToDelete->is_active) {
-                session()->flash('error', 'Tidak bisa menghapus periode yang sedang aktif.');
-            } else {
-                $this->periodeToDelete->delete();
-                session()->flash('message', 'Periode berhasil dihapus.');
-            }
+            $this->periodeToDelete->delete();
+            session()->flash('message', 'Periode berhasil dihapus.');
             $this->isDeleteModalOpen = false;
         }
     }
@@ -110,7 +95,6 @@ class KelolaPeriode extends Component
     {
         $this->periode_id = null;
         $this->nama = '';
-        $this->is_active = false;
         $this->periodeToDelete = null;
     }
 }

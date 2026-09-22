@@ -22,14 +22,9 @@ class PantauProker extends Component
 
     public function mount()
     {
-        $activePeriode = \App\Models\Periode::where('is_active', true)->first();
-        if ($activePeriode) {
-            $this->periode_id = $activePeriode->id;
-        } else {
-            $firstPeriode = \App\Models\Periode::latest()->first();
-            if ($firstPeriode) {
-                $this->periode_id = $firstPeriode->id;
-            }
+        $firstPeriode = \App\Models\Periode::latest()->first();
+        if ($firstPeriode) {
+            $this->periode_id = $firstPeriode->id;
         }
     }
 
@@ -58,6 +53,11 @@ class PantauProker extends Component
         $org = Organisasi::findOrFail($id);
         $this->selectedOrganisasi = $id;
         $this->selectedOrganisasiNama = $org->singkatan ?? $org->nama;
+        
+        if ($org->active_periode_id) {
+            $this->periode_id = $org->active_periode_id;
+        }
+
         $this->resetPage();
     }
 

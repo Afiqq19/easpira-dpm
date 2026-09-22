@@ -9,11 +9,7 @@ class Periode extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama', 'is_active'];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    protected $fillable = ['nama'];
 
     public function programKerja()
     {

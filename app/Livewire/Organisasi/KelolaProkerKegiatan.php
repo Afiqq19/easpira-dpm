@@ -40,10 +40,12 @@ class KelolaProkerKegiatan extends Component
 
     public function mount()
     {
-        $activePeriode = Periode::where('is_active', true)->first();
-        if ($activePeriode) {
-            $this->periode_id = $activePeriode->id;
-        } else {
+        $user = auth()->user();
+        if ($user->organisasi) {
+            $this->periode_id = $user->organisasi->active_periode_id;
+        }
+
+        if (!$this->periode_id) {
             $firstPeriode = Periode::latest()->first();
             if ($firstPeriode) {
                 $this->periode_id = $firstPeriode->id;
@@ -90,8 +92,10 @@ class KelolaProkerKegiatan extends Component
         $prokers = $query->latest()->paginate(10);
         $organisasis = \App\Models\Organisasi::all();
         
-        $selectedPeriode = Periode::find($this->periode_id);
-        $isReadOnly = $selectedPeriode ? !$selectedPeriode->is_active : true;
+        $isReadOnly = true;
+        if ($user->organisasi && $user->organisasi->active_periode_id == $this->periode_id) {
+            $isReadOnly = false;
+        }
 
         return view('livewire.organisasi.kelola-proker-kegiatan', compact('prokers', 'periodes', 'organisasis', 'isReadOnly'));
     }

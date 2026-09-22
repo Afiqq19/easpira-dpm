@@ -75,6 +75,14 @@ class Organisasi extends Model
         return $this->hasMany(ProgramKerja::class);
     }
 
+    /**
+     * Periode kepengurusan yang sedang aktif untuk organisasi ini
+     */
+    public function activePeriode()
+    {
+        return $this->belongsTo(Periode::class, 'active_periode_id');
+    }
+
     // =====================================================================
     // SCOPES
     // =====================================================================

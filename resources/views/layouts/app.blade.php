@@ -90,8 +90,10 @@
                                     LOG AKTIVITAS
                                 @elseif(request()->routeIs('*profile*'))
                                     PROFIL SAYA
+                                @elseif(isset($header))
+                                    {{ $header }}
                                 @else
-                                    {{ isset($header) ? strtoupper($header) : 'DASHBOARD' }}
+                                    DASHBOARD
                                 @endif
                             </span>
                         </div>

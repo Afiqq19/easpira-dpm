@@ -45,7 +45,6 @@
                 <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-4 font-medium">Nama Periode</th>
-                        <th class="px-6 py-4 font-medium">Status</th>
                         <th class="px-6 py-4 font-medium text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -54,17 +53,6 @@
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4 font-medium text-slate-800">
                                 {{ $periode->nama }}
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($periode->is_active)
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200">
-                                        Aktif
-                                    </span>
-                                @else
-                                    <button wire:click="setActive({{ $periode->id }})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 transition-colors">
-                                        Set Aktif
-                                    </button>
-                                @endif
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2">
