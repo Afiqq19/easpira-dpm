@@ -32,8 +32,8 @@ class GoogleController extends Controller
 
             $email = strtolower(trim($googleUser->getEmail() ?? ''));
 
-            // Validasi Domain Kampus Polmed (@students.polmed.ac.id atau @polmed.ac.id)
-            if (!Str::endsWith($email, ['@students.polmed.ac.id', '@polmed.ac.id'])) {
+            // Validasi Domain Kampus Polmed (Hanya @students.polmed.ac.id)
+            if (!Str::endsWith($email, ['@students.polmed.ac.id'])) {
                 return redirect()->route('login', [
                     'oauth_error'    => 'not_polmed',
                     'rejected_email' => $email
