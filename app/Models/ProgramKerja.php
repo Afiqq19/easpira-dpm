@@ -21,6 +21,7 @@ class ProgramKerja extends Model
         'tanggal_selesai',
         'status',
         'kategori',
+        'kategori_lainnya',
         'is_active',
     ];
 

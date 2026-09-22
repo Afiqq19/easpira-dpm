@@ -18,7 +18,8 @@ class KelolaProker extends Component
 
     public $proker_id, $nama, $deskripsi, $tanggal_mulai, $tanggal_selesai, $organisasi_id;
     public $status = 'rencana';
-    public $kategori = 'lainnya';
+    public $kategori = 'akademik';
+    public $kategori_lainnya = '';
     public $is_active = true;
 
     public $prokerToDelete = null;
@@ -27,6 +28,7 @@ class KelolaProker extends Component
         'nama.required' => 'Nama program kerja tidak boleh kosong.',
         'status.required' => 'Status harus dipilih.',
         'kategori.required' => 'Kategori harus dipilih.',
+        'kategori_lainnya.required_if' => 'Kategori lainnya wajib diisi jika kategori "Lainnya" dipilih.',
         'organisasi_id.required' => 'Organisasi harus dipilih.',
         'tanggal_selesai.after_or_equal' => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
     ];
@@ -92,6 +94,7 @@ class KelolaProker extends Component
         $this->tanggal_selesai = $proker->tanggal_selesai;
         $this->status = $proker->status;
         $this->kategori = $proker->kategori;
+        $this->kategori_lainnya = $proker->kategori_lainnya;
         $this->is_active = $proker->is_active;
         $this->organisasi_id = $proker->organisasi_id;
 
@@ -109,6 +112,7 @@ class KelolaProker extends Component
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
             'status' => 'required|in:rencana,berjalan,selesai,dibatalkan',
             'kategori' => 'required|in:akademik,sosial,olahraga,seni,lainnya',
+            'kategori_lainnya' => 'required_if:kategori,lainnya|nullable|string|max:255',
         ];
         
         if ($user->hasRole(['admin', 'staff_dewan'])) {
@@ -128,6 +132,7 @@ class KelolaProker extends Component
                 'tanggal_selesai' => $this->tanggal_selesai,
                 'status' => $this->status,
                 'kategori' => $this->kategori,
+                'kategori_lainnya' => $this->kategori === 'lainnya' ? $this->kategori_lainnya : null,
                 'is_active' => $this->is_active,
                 'organisasi_id' => $org_id,
                 'user_id' => auth()->id(),
@@ -183,7 +188,8 @@ class KelolaProker extends Component
         $this->tanggal_mulai = null;
         $this->tanggal_selesai = null;
         $this->status = 'rencana';
-        $this->kategori = 'lainnya';
+        $this->kategori = 'akademik';
+        $this->kategori_lainnya = '';
         $this->is_active = true;
         $this->organisasi_id = null;
         $this->prokerToDelete = null;

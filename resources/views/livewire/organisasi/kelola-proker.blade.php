@@ -47,7 +47,7 @@
                             <td class="px-6 py-4">
                                 <div class="font-medium text-slate-900">{{ $proker->nama }}</div>
                                 <div class="text-xs text-slate-500 font-semibold mt-1 flex items-center gap-2">
-                                    <span class="uppercase tracking-wider">{{ $proker->kategori }}</span>
+                                    <span class="uppercase tracking-wider">{{ $proker->kategori === 'lainnya' && $proker->kategori_lainnya ? $proker->kategori_lainnya : $proker->kategori }}</span>
                                     @if(auth()->user()->hasRole(['admin', 'staff_dewan']))
                                         <span class="px-1.5 py-0.5 rounded bg-slate-100 text-indigo-700 text-[10px]">{{ $proker->organisasi->singkatan ?? $proker->organisasi->nama ?? 'Tidak Diketahui' }}</span>
                                     @endif
@@ -154,15 +154,23 @@
 
                             <div>
                                 <label for="kategori" class="block text-sm font-semibold text-slate-700 mb-1">Kategori</label>
-                                <select wire:model="kategori" id="kategori" class="block w-full border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50">
+                                <select wire:model.live="kategori" id="kategori" class="block w-full border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-slate-50">
                                     <option value="akademik">Akademik</option>
                                     <option value="sosial">Sosial</option>
                                     <option value="olahraga">Olahraga</option>
                                     <option value="seni">Seni & Budaya</option>
-                                    <option value="lainnya">Lainnya</option>
+                                    <option value="lainnya">Lainnya...</option>
                                 </select>
                                 @error('kategori') <span class="text-rose-500 text-xs mt-1 block font-medium">{{ $message }}</span> @enderror
                             </div>
+
+                            @if($kategori === 'lainnya')
+                            <div class="col-span-full animate-fade-in">
+                                <label for="kategori_lainnya" class="block text-sm font-semibold text-slate-700 mb-1">Tuliskan Kategori</label>
+                                <input type="text" wire:model="kategori_lainnya" id="kategori_lainnya" class="block w-full border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Contoh: Keagamaan">
+                                @error('kategori_lainnya') <span class="text-rose-500 text-xs mt-1 block font-medium">{{ $message }}</span> @enderror
+                            </div>
+                            @endif
 
                             <div>
                                 <label for="status" class="block text-sm font-semibold text-slate-700 mb-1">Status Proker</label>
@@ -191,8 +199,6 @@
                                 <label for="deskripsi" class="block text-sm font-semibold text-slate-700 mb-1">Deskripsi Singkat (Opsional)</label>
                                 <textarea wire:model="deskripsi" id="deskripsi" rows="3" class="block w-full border-slate-200 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Jelaskan secara singkat tujuan atau target program kerja ini..."></textarea>
                                 @error('deskripsi') <span class="text-rose-500 text-xs mt-1 block font-medium">{{ $message }}</span> @enderror
-                            </div>
-                            
                             </div>
                         </div>
                     </div>
