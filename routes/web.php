@@ -231,7 +231,8 @@ Route::get('/update-rahasia-dpm', function () {
       }
       $output_backfill = implode("\n", $backfillLogs) ?: "Semua tiket sudah terhubung ke user_id.";
 
-    $output_optimize = shell_exec("cd \"$repoDir\" && php artisan optimize 2>&1");
+    // Jalankan clear cache & optimize
+    $output_optimize = shell_exec("cd \"$repoDir\" && php artisan optimize:clear 2>&1 && php artisan optimize 2>&1");
     $output_link = shell_exec("cd \"$repoDir\" && php artisan storage:link --force 2>&1");
     
     // Catatan: Jika NPM/Node.js belum terinstall di Docker ini, outputnya mungkin "command not found"

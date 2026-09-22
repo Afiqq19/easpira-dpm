@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengaduan;
+use App\Services\SimpleXlsxExporter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportPengaduanController extends Controller
@@ -24,41 +23,28 @@ class ExportPengaduanController extends Controller
             ->latest()
             ->get();
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Data Pengaduan');
-
         // Setup Headers (BOLD & CAPITALIZED)
         $headers = [
-            'NO', 'KODE TIKET', 'NAMA PELAPOR', 'EMAIL PELAPOR', 'KATEGORI', 
-            'ISI PENGADUAN', 'MODE PRIVASI', 'STATUS', 'TANGGAL MASUK', 
-            'JAM MASUK', 'TANGGAL SELESAI', 'JAM SELESAI'
+            'NO', 
+            'KODE TIKET', 
+            'NAMA PELAPOR', 
+            'EMAIL PELAPOR', 
+            'KATEGORI', 
+            'ISI PENGADUAN', 
+            'MODE PRIVASI', 
+            'STATUS', 
+            'TANGGAL MASUK', 
+            'JAM MASUK', 
+            'TANGGAL SELESAI', 
+            'JAM SELESAI'
         ];
 
-        $col = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue($col . '1', $header);
-            
-            // Format Bold & Background Color
-            $styleArray = [
-                'font' => [
-                    'bold' => true,
-                    'color' => ['argb' => 'FFFFFFFF'], // White text
-                ],
-                'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['argb' => 'FF4F46E5'], // Indigo-600 background
-                ],
-                'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                ]
-            ];
-            $sheet->getStyle($col . '1')->applyFromArray($styleArray);
-            $col++;
-        }
+        // Column widths for optimal display in Excel
+        $colWidths = [6, 18, 24, 26, 20, 45, 16, 16, 16, 13, 16, 13];
 
-        $row = 2;
+        $rows = [];
         $no = 1;
+
         foreach ($pengaduans as $pengaduan) {
             if ($pengaduan->mode_privasi === 'anonim') {
                 $nama = 'Anonim';
@@ -80,40 +66,44 @@ class ExportPengaduanController extends Controller
                 }
             }
 
-            $sheet->setCellValue('A' . $row, $no++);
-            $sheet->setCellValue('B' . $row, $pengaduan->ticket_code);
-            $sheet->setCellValue('C' . $row, $nama);
-            $sheet->setCellValue('D' . $row, $email);
-            $sheet->setCellValue('E' . $row, $pengaduan->kategori->nama_kategori ?? 'Umum');
-            $sheet->setCellValue('F' . $row, str_replace(["\r\n", "\n", "\r"], ' ', strip_tags($pengaduan->isi)));
-            $sheet->setCellValue('G' . $row, ucfirst($pengaduan->mode_privasi));
-            $sheet->setCellValue('H' . $row, ucfirst($pengaduan->status));
-            
-            // Setting format as string using setCellValueExplicit to avoid ##### formatting issues in Excel
-            $sheet->setCellValueExplicit('I' . $row, $pengaduan->created_at->format('d/m/Y'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('J' . $row, $pengaduan->created_at->format('H:i'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('K' . $row, $tanggalSelesai, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            $sheet->setCellValueExplicit('L' . $row, $jamSelesai, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $cleanIsi = str_replace(["\r\n", "\n", "\r", "\t"], ' ', strip_tags($pengaduan->isi));
+            $cleanIsi = preg_replace('/\s+/', ' ', trim($cleanIsi));
 
-            $row++;
+            $rows[] = [
+                $no++,
+                $pengaduan->ticket_code,
+                $nama,
+                $email,
+                $pengaduan->kategori->nama_kategori ?? 'Umum',
+                $cleanIsi,
+                ucfirst($pengaduan->mode_privasi ?? 'terbuka'),
+                ucfirst($pengaduan->status ?? 'menunggu'),
+                $pengaduan->created_at ? $pengaduan->created_at->format('d/m/Y') : '-',
+                $pengaduan->created_at ? $pengaduan->created_at->format('H:i') : '-',
+                $tanggalSelesai,
+                $jamSelesai
+            ];
         }
 
-        // Auto-size columns
-        foreach (range('A', 'L') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true);
-        }
+        $mainTitle = 'LAPORAN DATA PENGADUAN MAHASISWA e-ASPIRA DPM POLMED';
+        $subTitle = 'Diekspor pada: ' . now()->translatedFormat('d F Y, H:i') . ' WIB | Oleh: ' . ($user->name ?? $user->username);
 
-        $filename = 'Data_Pengaduan_e-Aspira_' . now()->format('d-m-Y') . '.xlsx';
+        $xlsxContent = SimpleXlsxExporter::create(
+            'Data Pengaduan',
+            $headers,
+            $rows,
+            $colWidths,
+            $mainTitle,
+            $subTitle
+        );
 
-        $response = new StreamedResponse(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        });
+        $filename = 'Data_Pengaduan_e-Aspira_' . now()->format('d-m-Y_His') . '.xlsx';
 
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment;filename="' . $filename . '"');
-        $response->headers->set('Cache-Control', 'max-age=0');
-
-        return $response;
+        return response($xlsxContent, 200, [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Cache-Control'       => 'max-age=0, no-cache, no-store, must-revalidate',
+            'Pragma'              => 'public',
+        ]);
     }
 }
