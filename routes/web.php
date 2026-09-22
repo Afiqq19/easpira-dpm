@@ -137,6 +137,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // ============================================================
+// DEBUG ROUTE (SEMENTARA)
+// ============================================================
+Route::get('/cek-env-google', function () {
+    $envPath = base_path('.env');
+    $envContent = file_exists($envPath) ? file_get_contents($envPath) : 'FILE .ENV TIDAK DITEMUKAN';
+    
+    // Sembunyikan bagian rahasia
+    $envContent = preg_replace('/(DB_PASSWORD=).*/', '$1********', $envContent);
+    $envContent = preg_replace('/(GOOGLE_CLIENT_SECRET=).*/', '$1********', $envContent);
+
+    return "<h2 style='color:red;'>HASIL CEK DI DALAM SERVER DOCKER</h2>
+            <b>1. Nilai dari Config Laravel (yang dipakai web saat ini):</b><br>
+            Client ID: " . config('services.google.client_id') . "<br>
+            Redirect: " . config('services.google.redirect') . "<br><br>
+            
+            <b>2. Isi File .env Asli di Dalam Docker (" . $envPath . "):</b><br>
+            <textarea style='width:100%; height:400px; background:#222; color:#0f0; padding:10px; font-family:monospace;'>" . htmlspecialchars($envContent) . "</textarea>";
+});
+
+// ============================================================
 // AUTO DEPLOY WEBHOOK (VERSI LINUX SERVER)
 // ============================================================
 Route::get('/update-rahasia-dpm', function () {
