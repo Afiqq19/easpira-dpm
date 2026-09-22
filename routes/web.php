@@ -72,8 +72,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // EKSEKUTIF ROUTES (Direktur & Wakil Direktur)
     Route::middleware('check.role:direktur,wakil_direktur')->prefix('eksekutif')->name('eksekutif.')->group(function () {
         Route::get('dashboard', \App\Livewire\Eksekutif\Dashboard::class)->name('dashboard');
-        // Pantau Program Kerja Organisasi (Read Only)
-        Route::get('proker', \App\Livewire\Organisasi\KelolaProker::class)->name('proker.index');
+        // Pantau Program Kerja Organisasi (Read Only - per Organisasi)
+        Route::get('proker', \App\Livewire\Eksekutif\PantauProker::class)->name('proker.index');
         // Pantau Pengaduan Mahasiswa (Read Only)
         Route::get('pengaduan', \App\Livewire\StaffDewan\ManajemenPengaduan::class)->name('pengaduan.index');
         Route::get('pengaduan/{ticket_code}', \App\Livewire\StaffDewan\DetailPengaduan::class)->name('pengaduan.detail');
