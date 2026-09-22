@@ -144,7 +144,7 @@ new class extends Component
 
             <!-- Organisasi -->
             @if($isOrganisasi && $user->organisasi)
-                <div>
+                <div class="sm:col-span-2">
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                         Organisasi
                     </label>
